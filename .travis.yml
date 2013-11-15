@@ -1,6 +1,6 @@
 language: c
-compuler: gcc
-
+compiler:
+  - gcc
 before_install:
   - sudo pip install cpp-coveralls --use-mirrors
 script:
