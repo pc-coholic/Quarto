@@ -7,3 +7,5 @@ script:
   - ./configure --enable-gcov && make && make check
 after_success:
   - coveralls --exclude lib --exclude tests
+notifications:
+  email: false
