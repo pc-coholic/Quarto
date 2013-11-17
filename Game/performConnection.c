@@ -6,45 +6,85 @@
 #include <sys/socket.h>
 
 #define CLIENTVERSION 1.0
-
-//Funktion prueft, ob nachricht vom Server mit '-' beginnt (wenn ja, wird abgebrochen)
-void checkMinus(char *nachricht) {
-   if(nachricht[0] == '-') {
-    perror("Verbindung wurde nicht akzeptiert");
-    exit(EXIT_FAILURE);
-  }
+#define BUF 251
+//Funktion prueft, ob buffer vom Server mit '-' beginnt (wenn ja, wird abgebrochen)
+void checkMinus(char *buffer) {
+	if(buffer[0] == '-') {
+		perror("Verbindung wurde nicht akzeptiert");
+		exit(EXIT_FAILURE);
+	}
 }
 
-//Methode gibt bei fehler 0 zurueck, bei Erfolg 1
+//Methode gibt bei Fehler 0 zurueck, bei Erfolg 1
 int performConnection(int socket, char* gameId) {
-  char nachricht[256];
-  
+	char bufferSend[BUF]; 
+	char bufferGet[BUF]; 
+	int len = 0;  
+
   //get gameserver version
-  read(socket,nachricht,255);
-  printf("%s",nachricht);
-  checkMinus(nachricht);
+	len = recv(socket, bufferGet, sizeof(bufferGet),0);
+	bufferGet[len]='\0';
+  printf("S: %s",bufferGet);
+  //checkMinus(buffer);
   
+
   //Client-Version an Server senden
-  snprintf(nachricht,13,"VERSION %f",CLIENTVERSION);
-  if(write(socket, nachricht, sizeof(nachricht)) < 0) {
-      perror("Fehler beim Schreiben in den Socket");
-  }
-  
+	snprintf(bufferSend,13,"VERSION %f",CLIENTVERSION);
+	len = strlen(bufferSend);
+	bufferSend[len] = '\0';
+	bufferSend[len+1] = '\n';
+	if(write(socket, bufferSend, (len+2)*sizeof(char)) < 0) {
+		perror("Fehler beim Schreiben in den Socket");
+	}
+   printf("C: %s\n",bufferSend);
+   
+
   //Client-Version vom Server akzeptiert?
-   read(socket,nachricht,255);
-   printf("%s",nachricht);
-   checkMinus(nachricht);
+	len = recv(socket, bufferGet, sizeof(bufferGet),0);
+	bufferGet[len]='\0';
+	printf("S: %s",bufferGet);
+  //checkMinus(buffer);
    
+
+  //Game_ID an Server senden 
+	snprintf(bufferSend,16,"ID %s",gameId);
+	len = strlen(bufferSend);
+	bufferSend[len] = '\0';
+	bufferSend[len+1] = '\n';
+	if(write(socket, bufferSend, (len+2)*sizeof(char)) < 0) {
+		perror("Fehler beim Schreiben in den Socket");
+	}
+	printf("C: %s\n",bufferSend);
    
-   //Game_ID an Server senden
-   snprintf(nachricht,30,"ID %s",gameId);
-   
-    if(write(socket, nachricht, sizeof(nachricht)) < 0) {
-      perror("Fehler beim Schreiben in den Socket");
-  }
-   
-   //Server: Welches Spiel?
-   read(socket,nachricht,255);
-   printf("%s",nachricht);
-   checkMinus(nachricht);
+	//Server: Welches Spiel?
+	len = recv(socket, bufferGet, sizeof(bufferGet),0);
+	bufferGet[len]='\0';
+	printf("S: %s",bufferGet);
+	//checkMinus(buffer);
+
+	//(fehlt) Fehlermeldung und Beenden vom Client falls Spiel != Quarto 
+	
+
+	//Server: Game-Name 
+	len = recv(socket, bufferGet, sizeof(bufferGet),0);
+	bufferGet[len]='\0';
+	printf("S: %s",bufferGet);
+	//checkMinus(buffer);
+
+	// Gewuenschte Spielernummer an Server senden 
+	//(fehlt) optional Spielernummer angeben
+	snprintf(bufferSend,7,"PLAYER");
+	len = strlen(bufferSend);
+	bufferSend[len] = '\0';
+	bufferSend[len+1] = '\n';
+	if(write(socket, bufferSend, (len+2)*sizeof(char)) < 0) {
+		perror("Fehler beim Schreiben in den Socket");
+	}
+	printf("C: %s\n",bufferSend);
+
+	//Server: zugeteilte Spielernummer und Name 
+	len = recv(socket, bufferGet, sizeof(bufferGet),0);
+	bufferGet[len]='\0';
+	printf("S: %s",bufferGet);
+	//checkMinus(buffer);
 }

@@ -1,54 +1,68 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netdb.h>
+#include <unistd.h>
+#include <errno.h>
 #include <string.h>
+#include <netdb.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
 #include <arpa/inet.h>
 
 #define GAMEKINDNAME "Quarto"
-#define PORTNUMMER 1357
+#define PORT "1357"
 #define HOSTNAME "sysprak.priv.lab.nm.ifi.lmu.de"
 
 int performConnection(int socket, char* gameId);
 
+int main(int argc, char *argv[]) {
+	int socke;
+	char gameId[15];
+	struct addrinfo hints, *servinfo, *p;
 
-int main(int argc, char* argv[]) {
-  
-  int socke;
-  char gameId[11];
-  struct sockaddr_in address;
-  struct sockaddr_in *h;
-  struct addrinfo *result;
- 
-  if (argc < 2) {
-    perror("keine Game-Id angegeben");
-  }
-  
-  //eingelesene GameId speichern
-  strcpy(gameId,argv[1]);
-  
-  //Socket anlegen
-   if( (socke = socket(PF_INET, SOCK_STREAM, 0)) == 0) {
-     perror("Socket konnte nicht angelegt werden.");
-   }
-   
-   address.sin_family = AF_INET;
-   address.sin_port = htons(PORTNUMMER);
-   
-   //SERVER-Adresse in IP-Adresse umwandeln
-   if( (getaddrinfo(HOSTNAME, NULL , NULL, &result)) < 0) {
-    perror("Fehler bei Serveraddresse"); 
-   }
-   h = (struct sockaddr_in*) result->ai_addr;
-    inet_ntoa(h->sin_addr);
-    address.sin_addr = (h->sin_addr);
-  
-  //Verbindung herstellen
-  if( connect(socke, (struct sockaddr *) &address, sizeof(address)) != 0) {
-    perror("Verbindung fehlgeschlagen!");
-  }
-  
-  performConnection(socke, gameId);
-  
+	//11-stellige Game-Id aus Kommandozeile auslesen
+	if (argc < 2) {
+		perror("Keine Game-Id angegeben!");
+		exit(EXIT_FAILURE);
+	}
+	strcpy(gameId,argv[1]);
+	if(strlen(gameId) != 11) {
+		perror("Game-Id muss 11-stellig sein!");
+		exit(EXIT_FAILURE);
+	}
+
+	memset(&hints, 0, sizeof hints);
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_socktype = SOCK_STREAM;
+
+	//Server-Adresse in IP-Adresse umwandeln
+	if (getaddrinfo(HOSTNAME, PORT, &hints, &servinfo) != 0) {
+		perror("Fehler beim Servernamen.");
+		exit(EXIT_FAILURE);
+	}
+
+	// loop through all the results and connect to the first we can
+	for(p = servinfo; p != NULL; p = p->ai_next) {
+		// Socket anlegen
+		if ((socke = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1) {
+			perror("Socket konnte nicht angelegt werden.");
+				continue;
+		}
+		// Mit Socket verbinden
+		if (connect(socke, p->ai_addr, p->ai_addrlen) == -1) {
+			close(socke);
+			perror("Verbindung mit Socket fehlgeschlagen.");
+			continue;
+		}
+		break;
+	}
+
+	if (p == NULL) {
+		fprintf(stderr, "Client konnte nicht verbunden worden.\n");
+		exit(EXIT_FAILURE);
+	}
+
+	freeaddrinfo(servinfo); // all done with this structure
+	
+	performConnection(socke, gameId);
 }
