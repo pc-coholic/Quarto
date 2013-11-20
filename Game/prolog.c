@@ -1,11 +1,11 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <errno.h>
-#include <string.h>
+#include <stdio.h> 
+#include <stdlib.h> 
+#include <unistd.h> 
+#include <errno.h> 
+#include <string.h> 
 #include <netdb.h>
-#include <sys/types.h>
-#include <netinet/in.h>
+#include <sys/types.h> 
+#include <netinet/in.h> 
 #include <sys/socket.h>
 #include <arpa/inet.h>
 
@@ -13,10 +13,12 @@
 #define PORT "1357"
 #define HOSTNAME "sysprak.priv.lab.nm.ifi.lmu.de"
 
-int performConnection(int socket, char* gameId);
+int performConnection(int socket, char* gameId, char player);
 
 int main(int argc, char *argv[]) {
 	int socke;
+	int ret; //fuer getopt funktion
+	char player = '3';
 	char gameId[15];
 	struct addrinfo hints, *servinfo, *p;
 
@@ -30,6 +32,21 @@ int main(int argc, char *argv[]) {
 		perror("Game-Id muss 11-stellig sein!");
 		exit(EXIT_FAILURE);
 	}
+
+	//optional gewunschte Spielernummer
+  while ((ret=getopt(argc, argv, "p:")) != -1) {
+    switch (ret) {
+      case 'p':
+				printf("getopt: %s \n", optarg);
+         player = optarg[0];
+				printf("player: %c \n", player);
+					if (player!='0' && player != '1') {
+						perror("Es gibt nur 2 Spieler! 0 oder 1 eingeben!");
+						exit(EXIT_FAILURE);
+				}
+         break;
+    }
+  }
 
 	memset(&hints, 0, sizeof hints);
 	hints.ai_family = AF_UNSPEC;
@@ -64,5 +81,7 @@ int main(int argc, char *argv[]) {
 
 	freeaddrinfo(servinfo); // all done with this structure
 	
-	performConnection(socke, gameId);
+	performConnection(socke, gameId, player);
+
+	return 0;
 }

@@ -16,7 +16,7 @@ void checkMinus(char *buffer) {
 }
 
 //Methode gibt bei Fehler 0 zurueck, bei Erfolg 1
-int performConnection(int socket, char* gameId) {
+int performConnection(int socket, char* gameId, int player) {
 	char bufferSend[BUF]; 
 	char bufferGet[BUF]; 
 	int len = 0;  
@@ -62,8 +62,11 @@ int performConnection(int socket, char* gameId) {
 	printf("S: %s",bufferGet);
 	//checkMinus(buffer);
 
-	//(fehlt) Fehlermeldung und Beenden vom Client falls Spiel != Quarto 
-	
+	// Fehlermeldung und Beenden vom Client falls Spiel != Quarto 
+	if(strcmp((bufferGet+10),"Quarto")==0) {
+		perror("Du spielst nicht Quarto, du Depp!");
+		exit(EXIT_FAILURE);
+	}	
 
 	//Server: Game-Name 
 	len = recv(socket, bufferGet, sizeof(bufferGet),0);
@@ -72,8 +75,13 @@ int performConnection(int socket, char* gameId) {
 	//checkMinus(buffer);
 
 	// Gewuenschte Spielernummer an Server senden 
-	//(fehlt) optional Spielernummer angeben
-	snprintf(bufferSend,7,"PLAYER");
+	// optional Spielernummer angeben
+	if (player!='3') {
+		snprintf(bufferSend,7,"PLAYER %c", player);
+	}
+	else {
+		snprintf(bufferSend,7,"PLAYER");
+	}
 	len = strlen(bufferSend);
 	bufferSend[len] = '\0';
 	bufferSend[len+1] = '\n';
@@ -87,4 +95,16 @@ int performConnection(int socket, char* gameId) {
 	bufferGet[len]='\0';
 	printf("S: %s",bufferGet);
 	//checkMinus(buffer);
+
+	//Server: SPieleranzahl 
+	len = recv(socket, bufferGet, sizeof(bufferGet),0);
+	bufferGet[len]='\0';
+	printf("S: %s",bufferGet);
+
+	//Server: Endplayers 
+	len = recv(socket, bufferGet, sizeof(bufferGet),0);
+	bufferGet[len]='\0';
+	printf("S: %s",bufferGet);
+
+	return 0;
 }
