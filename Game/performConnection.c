@@ -59,11 +59,12 @@ int performConnection(int socket, char* gameId, int player) {
 	//Server: Welches Spiel?
 	len = recv(socket, bufferGet, sizeof(bufferGet),0);
 	bufferGet[len]='\0';
-	printf("S: %s",bufferGet);
+	bufferGet[len+1]='\n';
+	printf("%s",bufferGet);
 	//checkMinus(buffer);
 
 	// Fehlermeldung und Beenden vom Client falls Spiel != Quarto 
-	if(strcmp((bufferGet+10),"Quarto")==0) {
+	if(strcmp((bufferGet+10),"Quarto\n")!=0) {
 		perror("Du spielst nicht Quarto, du Depp!");
 		exit(EXIT_FAILURE);
 	}	
@@ -96,7 +97,7 @@ int performConnection(int socket, char* gameId, int player) {
 	printf("S: %s",bufferGet);
 	//checkMinus(buffer);
 
-	//Server: SPieleranzahl 
+	//Server: Spieleranzahl 
 	len = recv(socket, bufferGet, sizeof(bufferGet),0);
 	bufferGet[len]='\0';
 	printf("S: %s",bufferGet);
