@@ -37,9 +37,7 @@ int main(int argc, char *argv[]) {
   while ((ret=getopt(argc, argv, "p:")) != -1) {
     switch (ret) {
       case 'p':
-				printf("getopt: %s \n", optarg);
          player = optarg[0];
-				printf("player: %c \n", player);
 					if (player!='0' && player != '1') {
 						perror("Es gibt nur 2 Spieler! 0 oder 1 eingeben!");
 						exit(EXIT_FAILURE);
