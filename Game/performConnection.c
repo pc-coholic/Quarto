@@ -7,12 +7,42 @@
 
 #define CLIENTVERSION 1.0
 #define BUF 251
+// allgemeine Konvention: Funktionen geben 1 bei Erfolg und 0 bei Fehler zurueck
+// bei Funktionen: im if-Zweig Fehlerfall abfragen
+
 //Funktion prueft, ob buffer vom Server mit '-' beginnt (wenn ja, wird abgebrochen)
 void checkMinus(char *buffer) {
 	if(buffer[0] == '-') {
 		perror("Verbindung wurde nicht akzeptiert");
 		exit(EXIT_FAILURE);
 	}
+}
+
+void newlineToArray (char *bufferGet, char *array[BUF]) {
+	
+}
+
+// Text vom Server empfangen (und nach Zeilen aufteilen)
+int getFromServer(int socket, char *bufferGet){
+	int len = recv(socket, bufferGet, sizeof(bufferGet-1),0);
+	bufferGet[len]='\0';
+	if (len <= 0) {
+		return 0;	
+	}
+  printf("S: %s",bufferGet);
+  //checkMinus(buffer);
+	return 1;	
+}
+
+// bufferSend muss mit \n terminiert sein 
+int sendToServer(int socket, char *bufferSend) {
+	int len = strlen(bufferSend);
+	if(write(socket, bufferSend, (len)*sizeof(char)) < 0) {
+		perror("Fehler beim Schreiben in den Socket");
+		return 0;
+	}
+  printf("C: %s\n",bufferSend);
+	return 1;
 }
 
 //Methode gibt bei Fehler 0 zurueck, bei Erfolg 1
@@ -22,18 +52,12 @@ int performConnection(int socket, char* gameId, int player) {
 	int len = 0;  
 
   //get gameserver version
-	len = recv(socket, bufferGet, sizeof(bufferGet),0);
-	bufferGet[len]='\0';
-  printf("S: %s",bufferGet);
-  //checkMinus(buffer);
-  
+	getFromServer(socket, bufferGet);
 
   //Client-Version an Server senden
-	snprintf(bufferSend,13,"VERSION %f",CLIENTVERSION);
+	snprintf(bufferSend,13,"VERSION %f\n",CLIENTVERSION);
 	len = strlen(bufferSend);
-	bufferSend[len] = '\0';
-	bufferSend[len+1] = '\n';
-	if(write(socket, bufferSend, (len+2)*sizeof(char)) < 0) {
+	if(write(socket, bufferSend, (len)*sizeof(char)) < 0) {
 		perror("Fehler beim Schreiben in den Socket");
 	}
    printf("C: %s\n",bufferSend);
