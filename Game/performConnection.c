@@ -18,6 +18,20 @@ void checkMinus(char *buffer) {
 	}
 }
 
+//liest nte Zeile aus dem Buffer
+void readNteLine (char *bufferGet, char *line, int lineNumber) {
+	int currentLine = 0;
+	int i;
+	while(currentLine != lineNumber) {
+		i=0;
+		do {
+			line[i] = bufferGet[i];
+			i++;
+		} while (bufferGet[i] != '\n');
+		currentLine++;
+	}
+}
+
 void newlineToArray (char *bufferGet, char *array[BUF]) {
 	
 }
@@ -29,11 +43,10 @@ int getFromServer(int socket, char *bufferGet){
 	if (len <= 0) {
 		return 0;	
 	}
-  printf("S: %s",bufferGet);
+  printf("S: %s\n",bufferGet);
   //checkMinus(buffer);
 	return 1;	
 }
-
 // bufferSend muss mit \n terminiert sein 
 int sendToServer(int socket, char *bufferSend) {
 	int len = strlen(bufferSend);
@@ -49,42 +62,27 @@ int sendToServer(int socket, char *bufferSend) {
 int performConnection(int socket, char* gameId, int player) {
 	char bufferSend[BUF]; 
 	char bufferGet[BUF]; 
-	int len = 0;  
-
+	
   //get gameserver version
 	getFromServer(socket, bufferGet);
 
   //Client-Version an Server senden
 	snprintf(bufferSend,13,"VERSION %f\n",CLIENTVERSION);
-	len = strlen(bufferSend);
-	if(write(socket, bufferSend, (len)*sizeof(char)) < 0) {
-		perror("Fehler beim Schreiben in den Socket");
-	}
-   printf("C: %s\n",bufferSend);
+	
+	sendToServer(socket, bufferSend);
    
 
   //Client-Version vom Server akzeptiert?
-	len = recv(socket, bufferGet, sizeof(bufferGet),0);
-	bufferGet[len]='\0';
-	printf("S: %s",bufferGet);
-  //checkMinus(buffer);
+	getFromServer(socket, bufferGet);
+	//checkMinus(buffer);
    
 
   //Game_ID an Server senden 
-	snprintf(bufferSend,16,"ID %s",gameId);
-	len = strlen(bufferSend);
-	bufferSend[len] = '\0';
-	bufferSend[len+1] = '\n';
-	if(write(socket, bufferSend, (len+2)*sizeof(char)) < 0) {
-		perror("Fehler beim Schreiben in den Socket");
-	}
-	printf("C: %s\n",bufferSend);
+	snprintf(bufferSend,16,"ID %s\n",gameId);
+	sendToServer(socket, bufferSend);
    
 	//Server: Welches Spiel?
-	len = recv(socket, bufferGet, sizeof(bufferGet),0);
-	bufferGet[len]='\0';
-	bufferGet[len+1]='\n';
-	printf("%s",bufferGet);
+	getFromServer(socket, bufferGet);
 	//checkMinus(buffer);
 
 	// Fehlermeldung und Beenden vom Client falls Spiel != Quarto 
@@ -94,9 +92,7 @@ int performConnection(int socket, char* gameId, int player) {
 	}	
 
 	//Server: Game-Name 
-	len = recv(socket, bufferGet, sizeof(bufferGet),0);
-	bufferGet[len]='\0';
-	printf("S: %s",bufferGet);
+	getFromServer(socket, bufferGet);
 	//checkMinus(buffer);
 
 	// Gewuenschte Spielernummer an Server senden 
@@ -107,29 +103,17 @@ int performConnection(int socket, char* gameId, int player) {
 	else {
 		snprintf(bufferSend,7,"PLAYER");
 	}
-	len = strlen(bufferSend);
-	bufferSend[len] = '\0';
-	bufferSend[len+1] = '\n';
-	if(write(socket, bufferSend, (len+2)*sizeof(char)) < 0) {
-		perror("Fehler beim Schreiben in den Socket");
-	}
-	printf("C: %s\n",bufferSend);
+	sendToServer(socket, bufferSend);
 
 	//Server: zugeteilte Spielernummer und Name 
-	len = recv(socket, bufferGet, sizeof(bufferGet),0);
-	bufferGet[len]='\0';
-	printf("S: %s",bufferGet);
+	getFromServer(socket, bufferGet);
 	//checkMinus(buffer);
 
 	//Server: Spieleranzahl 
-	len = recv(socket, bufferGet, sizeof(bufferGet),0);
-	bufferGet[len]='\0';
-	printf("S: %s",bufferGet);
+	getFromServer(socket, bufferGet);
 
 	//Server: Endplayers 
-	len = recv(socket, bufferGet, sizeof(bufferGet),0);
-	bufferGet[len]='\0';
-	printf("S: %s",bufferGet);
+	getFromServer(socket, bufferGet);
 
 	return 0;
 }
