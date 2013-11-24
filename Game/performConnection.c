@@ -20,75 +20,11 @@ void checkMinus(char *buffer) {
 	}
 }
 
-<<<<<<< HEAD
-//liest nte Zeile aus dem Buffer
-void readNteLine (char *bufferGet, char *line, int lineNumber) {
-	int currentLine = 0;
-	int i;
-	while(currentLine != lineNumber) {
-		i=0;
-		do {
-			line[i] = bufferGet[i];
-			i++;
-		} while (bufferGet[i] != '\n');
-		currentLine++;
-	}
-}
 
 void newlineToArray (char *bufferGet, char *array[BUF]) {
 	
 }
 
-// Text vom Server empfangen (und nach Zeilen aufteilen)
-int getFromServer(int socket, char *bufferGet){
-	int len = recv(socket, bufferGet, sizeof(bufferGet-1),0);
-	bufferGet[len]='\0';
-	if (len <= 0) {
-		return 0;	
-	}
-  printf("S: %s\n",bufferGet);
-  //checkMinus(buffer);
-	return 1;	
-}
-// bufferSend muss mit \n terminiert sein 
-int sendToServer(int socket, char *bufferSend) {
-	int len = strlen(bufferSend);
-	if(write(socket, bufferSend, (len)*sizeof(char)) < 0) {
-		perror("Fehler beim Schreiben in den Socket");
-		return 0;
-	}
-  printf("C: %s\n",bufferSend);
-	return 1;
-}
-
-//Methode gibt bei Fehler 0 zurueck, bei Erfolg 1
-int performConnection(int socket, char* gameId, int player) {
-	char bufferSend[BUF]; 
-	char bufferGet[BUF]; 
-	
-  //get gameserver version
-	getFromServer(socket, bufferGet);
-
-  //Client-Version an Server senden
-	snprintf(bufferSend,13,"VERSION %f\n",CLIENTVERSION);
-	
-	sendToServer(socket, bufferSend);
-   
-
-  //Client-Version vom Server akzeptiert?
-	getFromServer(socket, bufferGet);
-	//checkMinus(buffer);
-   
-
-  //Game_ID an Server senden 
-	snprintf(bufferSend,16,"ID %s\n",gameId);
-	sendToServer(socket, bufferSend);
-   
-	//Server: Welches Spiel?
-	getFromServer(socket, bufferGet);
-	//checkMinus(buffer);
-
-=======
 //Methode gibt bei Fehler 0 zurueck, bei Erfolg 1
 int performConnection(char* gameId, int player) {
 	char sendText[BUF]; 
@@ -115,7 +51,6 @@ int performConnection(char* gameId, int player) {
    
 	//Server: Welches Spiel?
 	getText = netReadLine();
->>>>>>> 8e78d175d795a5fcc0f2fe83b52e6f090530b80e
 	// Fehlermeldung und Beenden vom Client falls Spiel != Quarto 
 	if(strcmp((getText+10),"Quarto")!=0) {
 		perror("Du spielst nicht Quarto, du Depp!");
@@ -124,13 +59,8 @@ int performConnection(char* gameId, int player) {
 	netUpdateBuffer();
 
 	//Server: Game-Name 
-<<<<<<< HEAD
-	getFromServer(socket, bufferGet);
-	//checkMinus(buffer);
-=======
 	netReadLine();
 	netUpdateBuffer();
->>>>>>> 8e78d175d795a5fcc0f2fe83b52e6f090530b80e
 
 	// Gewuenschte Spielernummer an Server senden 
 	// optional Spielernummer angeben
@@ -140,19 +70,6 @@ int performConnection(char* gameId, int player) {
 	else {
 		snprintf(sendText,10,"PLAYER\n");
 	}
-<<<<<<< HEAD
-	sendToServer(socket, bufferSend);
-
-	//Server: zugeteilte Spielernummer und Name 
-	getFromServer(socket, bufferGet);
-	//checkMinus(buffer);
-
-	//Server: Spieleranzahl 
-	getFromServer(socket, bufferGet);
-
-	//Server: Endplayers 
-	getFromServer(socket, bufferGet);
-=======
 	netWrite(sendText);
 
 	//Server: zugeteilte Spielernummer und Name 
@@ -170,7 +87,6 @@ int performConnection(char* gameId, int player) {
 	//Server: Endplayers 
 	netReadLine();
 	netUpdateBuffer();
->>>>>>> 8e78d175d795a5fcc0f2fe83b52e6f090530b80e
 
 	return 0;
 }
