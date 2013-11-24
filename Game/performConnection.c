@@ -5,7 +5,9 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 
-#define CLIENTVERSION 1.0
+#include "network.h"
+
+#define CLIENTVERSION "1.42"
 #define BUF 251
 // allgemeine Konvention: Funktionen geben 1 bei Erfolg und 0 bei Fehler zurueck
 // bei Funktionen: im if-Zweig Fehlerfall abfragen
@@ -18,6 +20,7 @@ void checkMinus(char *buffer) {
 	}
 }
 
+<<<<<<< HEAD
 //liest nte Zeile aus dem Buffer
 void readNteLine (char *bufferGet, char *line, int lineNumber) {
 	int currentLine = 0;
@@ -85,24 +88,59 @@ int performConnection(int socket, char* gameId, int player) {
 	getFromServer(socket, bufferGet);
 	//checkMinus(buffer);
 
+=======
+//Methode gibt bei Fehler 0 zurueck, bei Erfolg 1
+int performConnection(char* gameId, int player) {
+	char sendText[BUF]; 
+	char *getText;
+	int len = 0;
+
+  // Server: gameserver version
+	netReadLine();
+	netUpdateBuffer();
+
+  //Client-Version an Server senden
+	snprintf(sendText,23,"VERSION %s\n",CLIENTVERSION);
+	len = strlen(sendText);
+	netWrite(sendText);
+
+  //Server: Client-Version vom akzeptiert?
+	netReadLine();
+	netUpdateBuffer();
+
+  //Game_ID an Server senden 
+	snprintf(sendText,16,"ID %s\n",gameId);
+	len = strlen(sendText);
+	netWrite(sendText);
+   
+	//Server: Welches Spiel?
+	getText = netReadLine();
+>>>>>>> 8e78d175d795a5fcc0f2fe83b52e6f090530b80e
 	// Fehlermeldung und Beenden vom Client falls Spiel != Quarto 
-	if(strcmp((bufferGet+10),"Quarto\n")!=0) {
+	if(strcmp((getText+10),"Quarto")!=0) {
 		perror("Du spielst nicht Quarto, du Depp!");
 		exit(EXIT_FAILURE);
 	}	
+	netUpdateBuffer();
 
 	//Server: Game-Name 
+<<<<<<< HEAD
 	getFromServer(socket, bufferGet);
 	//checkMinus(buffer);
+=======
+	netReadLine();
+	netUpdateBuffer();
+>>>>>>> 8e78d175d795a5fcc0f2fe83b52e6f090530b80e
 
 	// Gewuenschte Spielernummer an Server senden 
 	// optional Spielernummer angeben
 	if (player!='3') {
-		snprintf(bufferSend,7,"PLAYER %c", player);
+		snprintf(sendText,15,"PLAYER %c\n", player);
 	}
 	else {
-		snprintf(bufferSend,7,"PLAYER");
+		snprintf(sendText,10,"PLAYER\n");
 	}
+<<<<<<< HEAD
 	sendToServer(socket, bufferSend);
 
 	//Server: zugeteilte Spielernummer und Name 
@@ -114,6 +152,25 @@ int performConnection(int socket, char* gameId, int player) {
 
 	//Server: Endplayers 
 	getFromServer(socket, bufferGet);
+=======
+	netWrite(sendText);
+
+	//Server: zugeteilte Spielernummer und Name 
+	netReadLine();
+	netUpdateBuffer();
+
+	//Server: Spieleranzahl 
+	netReadLine();
+	netUpdateBuffer();
+
+	//Server: Spieler xy ist (nicht) bereit 
+	netReadLine();
+	netUpdateBuffer();
+
+	//Server: Endplayers 
+	netReadLine();
+	netUpdateBuffer();
+>>>>>>> 8e78d175d795a5fcc0f2fe83b52e6f090530b80e
 
 	return 0;
 }
