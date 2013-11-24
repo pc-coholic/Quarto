@@ -21,13 +21,22 @@ int main(int argc, char *argv[]) {
 	int ret; //fuer getopt funktion
 	char player = '3';
 	char gameId[15];
-
+	FILE* configDatei = NULL; 
+	char dateiName[256];
+	
 	//11-stellige Game-Id aus Kommandozeile auslesen
 	if (argc < 2) {
 		perror("Keine Game-Id angegeben!");
 		exit(EXIT_FAILURE);
 	}
 	strcpy(gameId,argv[1]);
+	
+	// Konfigurationsdatei implementieren fuer Meilenstein 2/1.
+	/*
+	strcpy(dateiName,argv[2]);
+	configDatei = openFile(dateiName);
+	*/
+	
 	if(strlen(gameId) != 11) {
 		perror("Game-Id muss 11-stellig sein!");
 		exit(EXIT_FAILURE);
@@ -46,6 +55,10 @@ int main(int argc, char *argv[]) {
     }
   }
 
+  
+  
+  
+  
 	//Verbindung mit Server herstellen
 	netConnect(PORT, HOSTNAME);
 
