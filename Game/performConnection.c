@@ -31,6 +31,8 @@ int performConnection(char* gameId, int player) {
 	char *getText;
 	int len = 0;
 
+	int i;
+
   // Server: gameserver version
 	netReadLine();
 	netUpdateBuffer();
@@ -48,6 +50,7 @@ int performConnection(char* gameId, int player) {
 	snprintf(sendText,16,"ID %s\n",gameId);
 	len = strlen(sendText);
 	netWrite(sendText);
+	printf("\nGame ID: %s\n",gameId);
    
 	//Server: Welches Spiel?
 	getText = netReadLine();
@@ -55,11 +58,13 @@ int performConnection(char* gameId, int player) {
 	if(strcmp((getText+10),"Quarto")!=0) {
 		perror("Du spielst nicht Quarto, du Depp!");
 		exit(EXIT_FAILURE);
-	}	
+	}
+	printf("%s\n",getText+2);	
 	netUpdateBuffer();
 
 	//Server: Game-Name 
-	netReadLine();
+	getText = netReadLine();
+	printf("Name: %s\n",getText+2);
 	netUpdateBuffer();
 
 	// Gewuenschte Spielernummer an Server senden 
@@ -73,17 +78,43 @@ int performConnection(char* gameId, int player) {
 	netWrite(sendText);
 
 	//Server: zugeteilte Spielernummer und Name 
-	netReadLine();
+	getText = netReadLine();
+	
+	// schöne Ausgabe
+	printf("\nYou are Player %c (",getText[6]);
+	i=8;
+	while(getText[i] != '\0') {
+		printf("%c",getText[i]);
+		i++;
+	}
+	printf(")\n");
+	//
 	netUpdateBuffer();
-
+	
 	//Server: Spieleranzahl 
 	netReadLine();
 	netUpdateBuffer();
 
 	//Server: Spieler xy ist (nicht) bereit 
 	netReadLine();
+	
+	// schöne Ausgabe
+	printf("Player %c (",getText[2]);
+	i=4;
+	while(getText[i] != ' ') {
+		printf("%c",getText[i]);
+		i++;
+	}
+	printf(") is ");
+	if (getText[i+1] == '1') {
+		printf("ready\n\n");
+	} else
+	{
+		printf("not ready\n\n");
+	}
+	//
 	netUpdateBuffer();
-
+	
 	//Server: Endplayers 
 	netReadLine();
 	netUpdateBuffer();

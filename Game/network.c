@@ -33,8 +33,8 @@ char* netReadLine() {
 		if(bufferGet[i]=='\n') {
 	  	bufferGet[i] = '\0';
 	    bufferEnde = i;
-	    printf("S: %s\n",bufferGet);
-	    fflush(stdout);
+	    //printf("S: %s\n",bufferGet);
+	    //fflush(stdout);
 	    return bufferGet;
 	  }
 	}
@@ -66,8 +66,8 @@ int netWrite(char *bufferSend) {
 		perror("Fehler beim Schreiben in den Socket");
 		return 0;
 	}
-	printf("C: %s\n",bufferSend);
-	fflush(stdout);
+	//printf("C: %s\n",bufferSend);
+	//fflush(stdout);
 	return 1;
 }
 

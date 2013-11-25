@@ -21,8 +21,8 @@ int main(int argc, char *argv[]) {
 	int ret; //fuer getopt funktion
 	char player = '3';
 	char gameId[15];
-	FILE* configDatei = NULL; 
-	char dateiName[256];
+	//FILE* configDatei = NULL; 
+	//char dateiName[256];
 	
 	//11-stellige Game-Id aus Kommandozeile auslesen
 	if (argc < 2) {
