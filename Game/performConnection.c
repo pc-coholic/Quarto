@@ -81,7 +81,7 @@ int performConnection(char* gameId, int player) {
 	getText = netReadLine();
 	
 	// schöne Ausgabe
-	printf("\nYou are Player %c (",getText[6]);
+	printf("\nYou are Player %i (",getText[6]-'0'+1);
 	i=8;
 	while(getText[i] != '\0') {
 		printf("%c",getText[i]);

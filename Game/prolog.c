@@ -11,6 +11,10 @@
 
 #include "network.h"
 
+//prozess
+#include <sys/wait.h>
+#include <signal.h>
+
 #define GAMEKINDNAME "Quarto"
 #define PORT "1357"
 #define HOSTNAME "sysprak.priv.lab.nm.ifi.lmu.de"
@@ -23,6 +27,8 @@ int main(int argc, char *argv[]) {
 	char gameId[15];
 	//FILE* configDatei = NULL; 
 	//char dateiName[256];
+	pid_t pid;
+	int prozessStatus;
 	
 	//11-stellige Game-Id aus Kommandozeile auslesen
 	if (argc < 2) {
@@ -43,28 +49,44 @@ int main(int argc, char *argv[]) {
 	}
 
 	//optional gewunschte Spielernummer einlesen 
-  while ((ret=getopt(argc, argv, "p:")) != -1) {
-    switch (ret) {
-      case 'p':
-         player = optarg[0];
-					if (player!='0' && player != '1') {
-						perror("Es gibt nur 2 Spieler! 0 oder 1 eingeben!");
-						exit(EXIT_FAILURE);
-				}
-         break;
-    }
-  }
+	while ((ret=getopt(argc, argv, "p:")) != -1) {
+	switch (ret) {
+	case 'p':
+		player = optarg[0];
+		if (player!='0' && player != '1') {
+			perror("Es gibt nur 2 Spieler! 0 oder 1 eingeben!");
+			exit(EXIT_FAILURE);
+		}
+		break;
+	}
+	}
 
-  
-  
-  
-  
-	//Verbindung mit Server herstellen
-	netConnect(PORT, HOSTNAME);
 
-	performConnection(gameId, player);
+	// zweiten Prozess erstellen.
+	// Connector ist der Kindprozess
+	// Thinker der Elternprozess
+	switch (pid = fork ()) {
+	case -1:
+		perror ("Fehler bei fork()\n");
+		break;
+	case 0: // Connector
+		
+		//Verbindung mit Server herstellen
+		netConnect(PORT, HOSTNAME);
+
+		performConnection(gameId, player);
 	
-	//Verbindung zum Server trennen
-	//netDisconnect();
+		//Verbindung zum Server trennen
+		//netDisconnect();
+		break;
+
+	default: // Thinker
+		if (wait (&prozessStatus) != pid) {
+			perror("Fehler beim Warten auf den Kindprozess");
+			return EXIT_FAILURE;
+		}
+		break;
+	}
+     
 	return 0;
 }
