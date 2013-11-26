@@ -9,21 +9,28 @@
 
 #define CLIENTVERSION "1.42"
 #define BUF 251
-// allgemeine Konvention: Funktionen geben 1 bei Erfolg und 0 bei Fehler zurueck
+// allgemeine Konvention:tismD6nu1.4 Funktionen geben 1 bei Erfolg und 0 bei Fehler zurueck
 // bei Funktionen: im if-Zweig Fehlerfall abfragen
+
+int checkAndSendWait(char *getText) {
+	char sendText[BUF];
+	int erg = 0;
+	if(strcmp(getText,"+ WAIT")==0) {
+		snprintf(sendText,10,"OKWAIT");
+		printf("%s\n",sendText);
+		erg = netWrite(sendText);
+	}
+	return erg;
+}
 
 //Funktion prueft, ob buffer vom Server mit '-' beginnt (wenn ja, wird abgebrochen)
 void checkMinus(char *buffer) {
 	if(buffer[0] == '-') {
-		perror("Verbindung wurde nicht akzeptiert");
+		printf("\n%s\n\n",buffer);
 		exit(EXIT_FAILURE);
 	}
 }
 
-
-void newlineToArray (char *bufferGet, char *array[BUF]) {
-	
-}
 
 //Methode gibt bei Fehler 0 zurueck, bei Erfolg 1
 int performConnection(char* gameId, int player) {
@@ -79,7 +86,7 @@ int performConnection(char* gameId, int player) {
 
 	//Server: zugeteilte Spielernummer und Name 
 	getText = netReadLine();
-	
+	checkMinus(getText);
 	// schöne Ausgabe
 	printf("\nYou are Player %i (",getText[6]-'0'+1);
 	i=8;
@@ -101,7 +108,7 @@ int performConnection(char* gameId, int player) {
 	// schöne Ausgabe
 	printf("Player %c (",getText[2]);
 	i=4;
-	while(getText[i] != ' ') {
+	while(getText[i+2] != '\0') {
 		printf("%c",getText[i]);
 		i++;
 	}
@@ -116,8 +123,15 @@ int performConnection(char* gameId, int player) {
 	netUpdateBuffer();
 	
 	//Server: Endplayers 
-	netReadLine();
+	printf("S: %s\n",netReadLine());
+	netUpdateBuffer();
+
+	//Server: wait
+	getText = netReadLine();
+	printf("%s\n",getText);
+	//checkAndSendWait(getText);
 	netUpdateBuffer();
 
 	return 0;
 }
+

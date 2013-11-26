@@ -28,7 +28,6 @@ int main(int argc, char *argv[]) {
 	//FILE* configDatei = NULL; 
 	//char dateiName[256];
 	pid_t pid;
-	int prozessStatus;
 	
 	//11-stellige Game-Id aus Kommandozeile auslesen
 	if (argc < 2) {
@@ -81,7 +80,7 @@ int main(int argc, char *argv[]) {
 		break;
 
 	default: // Thinker
-		if (wait (&prozessStatus) != pid) {
+		if (wait (NULL) != pid) {
 			perror("Fehler beim Warten auf den Kindprozess");
 			return EXIT_FAILURE;
 		}
