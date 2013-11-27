@@ -21,10 +21,19 @@
 	
 int	performConnection(char *gameId, char player);
 
+// Nutzungsbeschreibung des Clienten
+void help() {
+	printf("\nNutzung des Clients:	client [Game-ID] -p [0|1] -c [dateinname]\n");
+	printf("\n	-p:	gewünschte Spielernummer. 0 für Spieler 1, 1 für Spieler 2\n");
+	printf("	-c:	andere Konfigurationsdatei (Standard: client.conf)\n\n");
+}
+
 int main(int argc, char *argv[]) {
 	int ret; //fuer getopt funktion
 	char player = '3';
 	char gameId[15];
+	char *confDateiName=malloc(255*sizeof(char));
+	confDateiName = "client.conf";
 	//FILE* configDatei = NULL; 
 	//char dateiName[256];
 	pid_t pid;
@@ -32,6 +41,7 @@ int main(int argc, char *argv[]) {
 	//11-stellige Game-Id aus Kommandozeile auslesen
 	if (argc < 2) {
 		perror("Keine Game-Id angegeben!");
+		help();
 		exit(EXIT_FAILURE);
 	}
 	strcpy(gameId,argv[1]);
@@ -44,19 +54,27 @@ int main(int argc, char *argv[]) {
 	
 	if(strlen(gameId) != 11) {
 		perror("Game-Id muss 11-stellig sein!");
+		help();
 		exit(EXIT_FAILURE);
 	}
 
 	//optional gewunschte Spielernummer einlesen 
-	while ((ret=getopt(argc, argv, "p:")) != -1) {
+	while ((ret=getopt(argc, argv, "p:c:")) != -1) {
 	switch (ret) {
 	case 'p':
 		player = optarg[0];
 		if (player!='0' && player != '1') {
 			perror("Es gibt nur 2 Spieler! 0 oder 1 eingeben!");
+			help();
 			exit(EXIT_FAILURE);
 		}
 		break;
+	case 'c':
+		confDateiName = optarg;
+		break;
+	default:
+		help();
+		exit(EXIT_FAILURE);
 	}
 	}
 
@@ -66,7 +84,7 @@ int main(int argc, char *argv[]) {
 	// Thinker der Elternprozess
 	switch (pid = fork ()) {
 	case -1:
-		perror ("Fehler bei fork()\n");
+		perror ("Fehler bei fork()");
 		break;
 	case 0: // Connector
 		
