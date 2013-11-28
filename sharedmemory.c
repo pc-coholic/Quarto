@@ -2,40 +2,37 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 
-struct infos{
-char[] spielname;
+struct shmInfos{
+char[256] spielname; //wegen Länge überprüfen
 int spielernummer;
 int anzahlSpieler;
 int pid1;
 int pid2;
 };
 
-// In der Angabe steht keine MagicNumbers also einfach 0 als keyval? Ansonsten:
-// keyval muss erzeugt werden oder kann als Konstante definiert werden
-key_t key1 = ftok("/usr/include", 'x'); //weiss nicht welchen pathname man angeben soll
 
-// key_t ftok(const char *pathname, int proj_id);
+struct playerAttr{
+	int spielerNr;
+	char[256] name; // auf Größe achten
+	int registered; // 1, wenn registiert/bereit ist, 0, wenn nicht
+}
 
 
 // Shared Memory Segment wird erstellt und der ID des gemeinsamen Speicherbereichs zugewiesen
-
-if((int shmid = shmget(key1, sizeof(struct infos), IPC_PRIVATE))==-1){
+// Groesse des SHM: struktur + Eigenschaften von jedem Spieler (wieviele Spieler?)
+//erstmal fuer 2 Spieler (bis Loesung fuer shm-vergroesserung oder aehnliches
+if((int shmid = shmget(IPC_PRIVATE, sizeof(struct shmInfos) + 2*sizeof(struct playerAttr), IPC_PRIVATE))==-1){
 perror("Fehler beim Segment erstellen");
 }
 
-//.... was gemacht werden soll dazwischen
-
-
-// Shared Memory Segment anbinden
-if((int adrAnfang = void *shmat(shmid,NULL,0))==-1){
+//Shared-Memory-Bereich anbinden
+//muss bei jedem Prozess eingefügt werden:
+if((char *anfAddr = smat(shmid, NULL, 0)) == -1) {
 perror("Fehler beim Binden an einen Prozess");
 }
 
 
-
-
-
 // Segment wieder löschen bei Prozessende
-if((int loeschen = shmctl(shmid,IPC_RMID,shmid_ds))==-1){
-perror("Fehler beim Loeschen des Shared Memory Segments");
+if(shmctl(shmid, IPC_RMID, NULL)==-1) {
+	perror("Fehler beim Loeschen des Shared Memory Segments");
 }
