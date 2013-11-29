@@ -36,26 +36,21 @@ void checkMinus(char *buffer) {
 int performConnection(char* gameId, int player) {
 	char sendText[BUF]; 
 	char *getText;
-	int len = 0;
 
 	int i;
 
   // Server: gameserver version
 	netReadLine();
-	netUpdateBuffer();
 
   //Client-Version an Server senden
 	snprintf(sendText,23,"VERSION %s\n",CLIENTVERSION);
-	len = strlen(sendText);
 	netWrite(sendText);
 
   //Server: Client-Version vom akzeptiert?
 	netReadLine();
-	netUpdateBuffer();
 
   //Game_ID an Server senden 
 	snprintf(sendText,16,"ID %s\n",gameId);
-	len = strlen(sendText);
 	netWrite(sendText);
 	printf("\nGame ID: %s\n",gameId);
    
@@ -67,12 +62,10 @@ int performConnection(char* gameId, int player) {
 		exit(EXIT_FAILURE);
 	}
 	printf("%s\n",getText+2);	
-	netUpdateBuffer();
 
 	//Server: Game-Name 
 	getText = netReadLine();
 	printf("Name: %s\n",getText+2);
-	netUpdateBuffer();
 
 	// Gewuenschte Spielernummer an Server senden 
 	// optional Spielernummer angeben
@@ -95,12 +88,9 @@ int performConnection(char* gameId, int player) {
 		i++;
 	}
 	printf(")\n");
-	//
-	netUpdateBuffer();
 	
 	//Server: Spieleranzahl 
 	netReadLine();
-	netUpdateBuffer();
 
 	//Server: Spieler xy ist (nicht) bereit 
 	netReadLine();
@@ -119,18 +109,14 @@ int performConnection(char* gameId, int player) {
 	{
 		printf("not ready\n\n");
 	}
-	//
-	netUpdateBuffer();
 	
 	//Server: Endplayers 
 	printf("S: %s\n",netReadLine());
-	netUpdateBuffer();
 
 	//Server: wait
 	getText = netReadLine();
 	printf("%s\n",getText);
 	//checkAndSendWait(getText);
-	netUpdateBuffer();
 
 	return 0;
 }

@@ -10,7 +10,5 @@ char* netReadLine();
 //dem Server eine Zeile ins Socket schreiben
 int netWrite(char *bufferSend);
 
-int netUpdateBuffer();
-
 #endif
 

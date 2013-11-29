@@ -13,50 +13,56 @@
 #define BUF 251
 
 //Hilfsfunktionen
-int netRecv();
-int netUpdateBuffer();
+static int netRecv(char* bufAnf, size_t bufRestLen);
+static int netUpdateBuffer(char* bufferGet, int bufferBenutzt, int bufferEnde);
 
 //Variablen
-int socke;
-
-int bufferBenutzt = 0;//bis zu welcher Stelle von buffer eingelesen wurde
-int bufferEnde = 0; //Stelle von newline im buffer
-//char bufferSend[BUF];
-char bufferGet[BUF];
-
+int socke; //Socket
 
 //Funktion: Liest eine Zeile vom Server
 char* netReadLine() {
+	static int bufferBenutzt = 0;//bis zu welcher Stelle von buffer eingelesen wurde
+	static int bufferEnde = 0; //Stelle von newline im buffer
+	static char bufferGet[BUF];
+
+	// Wenn bereits Text im Buffer steht: noch nicht ausgegebenen Teil des Buffers nach vorne schieben + bufferBenutzt ändern
+	if (bufferBenutzt > 0 && bufferEnde > 0) {
+   	bufferBenutzt -= netUpdateBuffer(bufferGet, bufferBenutzt, bufferEnde);
+	}
+
 	while(1) {
   //ist eine ganze Zeile im Buffer? -> ausgeben
 	for (int i=0; i<bufferBenutzt; i++) {
 		if(bufferGet[i]=='\n') {
 	  	bufferGet[i] = '\0';
 	    bufferEnde = i;
-	    //printf("S: %s\n",bufferGet);
+	   	//printf("S: %s\n",bufferGet);
 	    //fflush(stdout);
 	    return bufferGet;
 	  }
 	}
 	//ansonsten vom Server empfangen
-	netRecv();
+	bufferBenutzt += netRecv(bufferGet + bufferBenutzt, BUF-bufferBenutzt);
 	}
 }
 
 //Hilfs-Funktion empfaengt Text vom Server
-int netRecv(){
-	int len = recv(socke, (bufferGet + bufferBenutzt), BUF-1,0);
-	bufferBenutzt += len;
-	return 1;
+static int netRecv(char* bufAnf, size_t bufRestLen){
+		
+	int len = recv(socke, bufAnf, bufRestLen,0);
+	if(len == -1) {
+		perror("Fehler beim Empfangen von Daten vom Server!");
+		return 0;
+	}
+	return len;
 }
 
 //Hilfs-Funktion: noch nicht ausgegebenen Teil des Buffers nach vorne schieben + bufferBenutzt ändern
-int netUpdateBuffer() {
+static int netUpdateBuffer(char* bufferGet, int bufferBenutzt, int bufferEnde ) {
    for(int j=bufferEnde+1, k=0; j<=bufferBenutzt; j++,k++) {
      bufferGet[k] = bufferGet[j];
    }
-   bufferBenutzt -= bufferEnde+1;  
-   return 1;
+		return bufferEnde+1;
  }
 
 // Schreibt den Text aus *bufferSend in das Socket
