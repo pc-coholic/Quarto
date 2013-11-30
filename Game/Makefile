@@ -1,6 +1,6 @@
-CC=clang
-CFLAGS=-c -Wall -Werror
-SOURCES=performConnection.c prolog.c network.c
+CC?=clang
+CFLAGS=-c -Wall -Werror -std=c99
+SOURCES=performConnection.c prolog.c network.c sharedmemory.c
 OBJECTS=$(SOURCES:.c=.o)
 EXECUTABLE=client
 

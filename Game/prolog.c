@@ -10,6 +10,7 @@
 #include <arpa/inet.h>
 
 #include "network.h"
+#include "sharedmemory.h"
 
 //prozess
 #include <sys/wait.h>
@@ -32,10 +33,10 @@ int main(int argc, char *argv[]) {
 	int ret; //fuer getopt funktion
 	char player = '3';
 	char gameId[15];
-	char *confDateiName=malloc(255*sizeof(char));
-	confDateiName = "client.conf";
+	char confDateiName[256] = "client.conf";
+	printf("%s",confDateiName);
 	//FILE* configDatei = NULL; 
-	//char dateiName[256];
+
 	pid_t pid;
 	
 	//11-stellige Game-Id aus Kommandozeile auslesen
@@ -58,7 +59,7 @@ int main(int argc, char *argv[]) {
 		exit(EXIT_FAILURE);
 	}
 
-	//optional gewunschte Spielernummer einlesen 
+	//optional gewunschte Spielernummer und config Dateiname einlesen 
 	while ((ret=getopt(argc, argv, "p:c:")) != -1) {
 	switch (ret) {
 	case 'p':
@@ -70,7 +71,7 @@ int main(int argc, char *argv[]) {
 		}
 		break;
 	case 'c':
-		confDateiName = optarg;
+		confDateiName[256] = *optarg;
 		break;
 	default:
 		help();
@@ -87,6 +88,12 @@ int main(int argc, char *argv[]) {
 		perror ("Fehler bei fork()");
 		break;
 	case 0: // Connector
+	
+		//Ich will hier das SharedMemory Segment ueber meine Funktionen erstellen
+		// shmSegment() um die ID zu erstellen und shmAnbinden(shmid); um es an den Prozess zu binden. 
+		// Was mach ich fuer Logikfehler, dass die Funktionen hier nicht funktionieren?
+		int shmid = shmSegment();
+		shmAnbinden(shmid);
 		
 		//Verbindung mit Server herstellen
 		netConnect(PORT, HOSTNAME);
