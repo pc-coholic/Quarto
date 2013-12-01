@@ -41,7 +41,7 @@ int main(int argc, char *argv[]) {
 	
 	//11-stellige Game-Id aus Kommandozeile auslesen
 	if (argc < 2) {
-		perror("Keine Game-Id angegeben!");
+		printf("Keine Game-Id angegeben!");
 		help();
 		exit(EXIT_FAILURE);
 	}
@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
 	*/
 	
 	if(strlen(gameId) != 11) {
-		perror("Game-Id muss 11-stellig sein!");
+		printf("Game-Id muss 11-stellig sein!");
 		help();
 		exit(EXIT_FAILURE);
 	}
@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
 	case 'p':
 		player = optarg[0];
 		if (player!='0' && player != '1') {
-			perror("Es gibt nur 2 Spieler! 0 oder 1 eingeben!");
+			prinf("Es gibt nur 2 Spieler! 0 oder 1 eingeben!");
 			help();
 			exit(EXIT_FAILURE);
 		}
@@ -85,7 +85,7 @@ int main(int argc, char *argv[]) {
 	// Thinker der Elternprozess
 	switch (pid = fork ()) {
 	case -1:
-		perror ("Fehler bei fork()");
+		printf ("Fehler bei fork()");
 		break;
 	case 0: // Connector
 	
@@ -106,7 +106,7 @@ int main(int argc, char *argv[]) {
 
 	default: // Thinker
 		if (wait (NULL) != pid) {
-			perror("Fehler beim Warten auf den Kindprozess");
+			printf("Fehler beim Warten auf den Kindprozess");
 			return EXIT_FAILURE;
 		}
 		break;

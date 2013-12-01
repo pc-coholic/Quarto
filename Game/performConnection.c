@@ -58,7 +58,7 @@ int performConnection(char* gameId, int player) {
 	getText = netReadLine();
 	// Fehlermeldung und Beenden vom Client falls Spiel != Quarto 
 	if(strcmp((getText+10),"Quarto")!=0) {
-		perror("Du spielst nicht Quarto, du Depp!");
+		printf("Du spielst nicht Quarto, du Depp!");
 		exit(EXIT_FAILURE);
 	}
 	printf("%s\n",getText+2);	
