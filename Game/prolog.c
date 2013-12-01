@@ -8,13 +8,13 @@
 #include <netinet/in.h> 
 #include <sys/socket.h>
 #include <arpa/inet.h>
-
-#include "network.h"
-#include "sharedmemory.h"
-
+#include <getopt.h>
 //prozess
 #include <sys/wait.h>
 #include <signal.h>
+
+#include "network.h"
+#include "sharedmemory.h"
 
 #define GAMEKINDNAME "Quarto"
 #define PORT "1357"
@@ -65,13 +65,13 @@ int main(int argc, char *argv[]) {
 	case 'p':
 		player = optarg[0];
 		if (player!='0' && player != '1') {
-			prinf("Es gibt nur 2 Spieler! 0 oder 1 eingeben!");
+			printf("Es gibt nur 2 Spieler! 0 oder 1 eingeben!");
 			help();
 			exit(EXIT_FAILURE);
 		}
 		break;
 	case 'c':
-		confDateiName[256] = *optarg;
+		confDateiName[0] = *optarg;
 		break;
 	default:
 		help();
@@ -79,6 +79,12 @@ int main(int argc, char *argv[]) {
 	}
 	}
 
+	//Shared-Memory anbinden
+	// shmSegment() um die ID zu erstellen -> vor fork()
+	int shmid = shmSegment();
+
+	//und shmAnbinden(shmid); um es an den Prozess zu binden.-> muss dann in jeden Prozess einzeln
+	// shmAnbinden(shmid);
 
 	// zweiten Prozess erstellen.
 	// Connector ist der Kindprozess
@@ -88,12 +94,6 @@ int main(int argc, char *argv[]) {
 		printf ("Fehler bei fork()");
 		break;
 	case 0: // Connector
-	
-		//Ich will hier das SharedMemory Segment ueber meine Funktionen erstellen
-		// shmSegment() um die ID zu erstellen und shmAnbinden(shmid); um es an den Prozess zu binden. 
-		// Was mach ich fuer Logikfehler, dass die Funktionen hier nicht funktionieren?
-		int shmid = shmSegment();
-		shmAnbinden(shmid);
 		
 		//Verbindung mit Server herstellen
 		netConnect(PORT, HOSTNAME);
