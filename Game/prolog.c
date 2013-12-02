@@ -13,8 +13,8 @@
 #include <sys/wait.h>
 #include <signal.h>
 
-#include "network.h"
 #include "sharedmemory.h"
+#include "network.h"
 
 #define GAMEKINDNAME "Quarto"
 #define PORT "1357"
@@ -84,7 +84,9 @@ int main(int argc, char *argv[]) {
 	int shmid = shmSegment();
 
 	//und shmAnbinden(shmid); um es an den Prozess zu binden.-> muss dann in jeden Prozess einzeln
-	// shmAnbinden(shmid);
+	 shmAnbinden(shmid);
+	// einmal Pointer für structure für die shmInfos
+	// einmal Pointer fuer array von structure von playerAttr (fuer die 2 player)
 
 	// zweiten Prozess erstellen.
 	// Connector ist der Kindprozess
