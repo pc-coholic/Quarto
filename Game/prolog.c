@@ -20,7 +20,7 @@
 #define PORT "1357"
 #define HOSTNAME "sysprak.priv.lab.nm.ifi.lmu.de"
 	
-int	performConnection(char *gameId, char player);
+int	performConnection(char *gameId, char player, struct shmInfos *shmPtr);
 
 // Nutzungsbeschreibung des Clienten
 void help() {
@@ -84,8 +84,12 @@ int main(int argc, char *argv[]) {
 	int shmid = shmSegment();
 
 	//und shmAnbinden(shmid); um es an den Prozess zu binden.-> muss dann in jeden Prozess einzeln
-	struct shmInfos shm;
+	struct shmInfos *shmPtr;
+	shmPtr = shmAnbinden(shmid);
+	//shmPtr->eigSpielernummer = 10;
+	//printf("%i",shmPtr->eigSpielernummer);
 
+	//shm automatisch entfernen, wenn alle prozesse detached
 	shmDelete(shmid);
 
 	// zweiten Prozess erstellen.
@@ -100,7 +104,7 @@ int main(int argc, char *argv[]) {
 		//Verbindung mit Server herstellen
 		netConnect(PORT, HOSTNAME);
 
-		performConnection(gameId, player);
+		performConnection(gameId, player, shmPtr);
 	
 		//Verbindung zum Server trennen
 		//netDisconnect();

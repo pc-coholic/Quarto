@@ -6,6 +6,7 @@
 #include <sys/socket.h>
 
 #include "network.h"
+#include "sharedmemory.h"
 
 #define CLIENTVERSION "1.42"
 #define BUF 251
@@ -33,7 +34,7 @@ void checkMinus(char *buffer) {
 
 
 //Methode gibt bei Fehler 0 zurueck, bei Erfolg 1
-int performConnection(char* gameId, int player) {
+int performConnection(char* gameId, int player, struct shmInfos *shmPtr) {
 	char sendText[BUF]; 
 	char *getText;
 
