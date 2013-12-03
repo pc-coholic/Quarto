@@ -84,9 +84,9 @@ int main(int argc, char *argv[]) {
 	int shmid = shmSegment();
 
 	//und shmAnbinden(shmid); um es an den Prozess zu binden.-> muss dann in jeden Prozess einzeln
-	 shmAnbinden(shmid);
-	// einmal Pointer für structure für die shmInfos
-	// einmal Pointer fuer array von structure von playerAttr (fuer die 2 player)
+	struct shmInfos shm;
+
+	shmDelete(shmid);
 
 	// zweiten Prozess erstellen.
 	// Connector ist der Kindprozess
