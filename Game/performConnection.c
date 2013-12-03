@@ -84,11 +84,19 @@ int performConnection(char* gameId, int player, struct shmInfos *shmPtr) {
 	getText = netReadLine();
 	checkMinus(getText);
 	// Spielernummer in shmInfo eintragen
-	shmPtr->eigSpielernummer = getText[9];
+	shmPtr->eigSpielernummer = getText[6]-'0';
+	//printf("eigSpielernummer = %i",shmPtr->eigSpielernummer);
 	//struct PlayerAttr befuellen fuer unseren Client 
 	shmPtr->attr[shmPtr->eigSpielernummer].spielerNr = shmPtr->eigSpielernummer;
-	strcpy(shmPtr->attr[shmPtr->eigSpielernummer].name,getText+11);
+	strcpy(shmPtr->attr[shmPtr->eigSpielernummer].name,getText+8);
 	shmPtr->attr[shmPtr->eigSpielernummer].registered = 1;
+	
+	// Ausgabe Versuch Client Spieler
+	printf("SpielernNr Client %i\n",shmPtr->attr[shmPtr->eigSpielernummer].spielerNr);
+	printf("Spielername Client %s\n",shmPtr->attr[shmPtr->eigSpielernummer].name);
+	printf("Spieler Registered Client %i\n",shmPtr->attr[shmPtr->eigSpielernummer].registered);	
+	
+	
 	// schöne Ausgabe
 	printf("\nYou are Player %i (",getText[6]-'0'+1);
 	i=8;
@@ -101,17 +109,21 @@ int performConnection(char* gameId, int player, struct shmInfos *shmPtr) {
 	//Server: Spieleranzahl 
 	getText = netReadLine();
 	// Spieleranzahl in shmInfo eintragen
-	shmPtr->anzahlSpieler = getText[12];
+	shmPtr->anzahlSpieler = getText[8]-'0';
 
 	//Server: Spieler xy ist (nicht) bereit 
 	getText = netReadLine();
-	shmPtr->attr[getText[5]-1].spielerNr = getText[5]-1;
-	strcpy(shmPtr->attr[getText[5]-1].name,getText+7);
-	shmPtr->attr[getText[5]-1].registered = getText[strlen(getText)-1];
+	int anzSp = (getText[2]-'0')-1;
+	// Anderer Spieler vom Server in shm Struktur schreiben
+	shmPtr->attr[anzSp].spielerNr = anzSp;
+	strncpy(shmPtr->attr[anzSp].name,getText+4,strlen(getText+4)-2);
+	shmPtr->attr[anzSp].name[strlen(getText+4)-2] = '\0';
+	shmPtr->attr[anzSp].registered = getText[strlen(getText)-1]-'0';
 	// Ausgabe Versuch:
-	printf("SpielernNr Server %i\n",shmPtr->attr[getText[5]-1].spielerNr);
-	printf("Spielername Server %s\n",shmPtr->attr[getText[5]-1].name);
-	printf("Spieler Registered Server %i\n",shmPtr->attr[getText[5]-1].registered);	
+	
+	printf("SpielernNr Server %i\n",shmPtr->attr[anzSp].spielerNr);
+	printf("Spielername Server %s\n",shmPtr->attr[anzSp].name);
+	printf("Spieler Registered Server %i\n",shmPtr->attr[anzSp].registered);	
 	
 	// schöne Ausgabe
 	printf("Player %c (",getText[2]);
