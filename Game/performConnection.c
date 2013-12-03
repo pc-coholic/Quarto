@@ -57,6 +57,8 @@ int performConnection(char* gameId, int player, struct shmInfos *shmPtr) {
    
 	//Server: Welches Spiel?
 	getText = netReadLine();
+	// Spielname in shmInfo eintragen
+	strcpy(shmPtr->spielname,getText);
 	// Fehlermeldung und Beenden vom Client falls Spiel != Quarto 
 	if(strcmp((getText+10),"Quarto")!=0) {
 		printf("Du spielst nicht Quarto, du Depp!");
@@ -81,6 +83,12 @@ int performConnection(char* gameId, int player, struct shmInfos *shmPtr) {
 	//Server: zugeteilte Spielernummer und Name 
 	getText = netReadLine();
 	checkMinus(getText);
+	// Spielernummer in shmInfo eintragen
+	shmPtr->eigSpielernummer = getText[9];
+	//struct PlayerAttr befuellen fuer unseren Client 
+	shmPtr->attr[shmPtr->eigSpielernummer].spielerNr = shmPtr->eigSpielernummer;
+	strcpy(shmPtr->attr[shmPtr->eigSpielernummer].name,getText+11);
+	shmPtr->attr[shmPtr->eigSpielernummer].registered = 1;
 	// schöne Ausgabe
 	printf("\nYou are Player %i (",getText[6]-'0'+1);
 	i=8;
@@ -91,10 +99,19 @@ int performConnection(char* gameId, int player, struct shmInfos *shmPtr) {
 	printf(")\n");
 	
 	//Server: Spieleranzahl 
-	netReadLine();
+	getText = netReadLine();
+	// Spieleranzahl in shmInfo eintragen
+	shmPtr->anzahlSpieler = getText[12];
 
 	//Server: Spieler xy ist (nicht) bereit 
-	netReadLine();
+	getText = netReadLine();
+	shmPtr->attr[getText[5]-1].spielerNr = getText[5]-1;
+	strcpy(shmPtr->attr[getText[5]-1].name,getText+7);
+	shmPtr->attr[getText[5]-1].registered = getText[strlen(getText)-1];
+	// Ausgabe Versuch:
+	printf("SpielernNr Server %i\n",shmPtr->attr[getText[5]-1].spielerNr);
+	printf("Spielername Server %s\n",shmPtr->attr[getText[5]-1].name);
+	printf("Spieler Registered Server %i\n",shmPtr->attr[getText[5]-1].registered);	
 	
 	// schöne Ausgabe
 	printf("Player %c (",getText[2]);

@@ -13,8 +13,8 @@ struct shmInfos{
 	char spielname[30]; // kann nur 30 Zeichen lang sein
 	int eigSpielernummer;
 	int anzahlSpieler;
+	int pid0;
 	int pid1;
-	int pid2;
 	struct playerAttr attr[ANZAHLSPIELER];
 };
 

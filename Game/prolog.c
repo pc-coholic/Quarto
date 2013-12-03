@@ -100,7 +100,7 @@ int main(int argc, char *argv[]) {
 		printf ("Fehler bei fork()");
 		break;
 	case 0: // Connector
-		
+			shmPtr->pid1=pid;
 		//Verbindung mit Server herstellen
 		netConnect(PORT, HOSTNAME);
 
@@ -111,6 +111,7 @@ int main(int argc, char *argv[]) {
 		break;
 
 	default: // Thinker
+		shmPtr->pid0=pid;
 		if (wait (NULL) != pid) {
 			printf("Fehler beim Warten auf den Kindprozess");
 			return EXIT_FAILURE;
