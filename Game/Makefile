@@ -1,6 +1,6 @@
 CC?=clang
 CFLAGS=-c -Wall -Werror -ggdb -std=gnu99
-SOURCES=performConnection.c network.c sharedmemory.c prolog.c
+SOURCES=logger.c performConnection.c network.c sharedmemory.c prolog.c
 OBJECTS=$(SOURCES:.c=.o)
 EXECUTABLE=client
 

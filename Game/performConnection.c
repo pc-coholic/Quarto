@@ -6,10 +6,11 @@
 #include <sys/socket.h>
 
 #include "network.h"
+#include "logger.h"
 
 #define CLIENTVERSION "1.42"
 #define BUF 251
-// allgemeine Konvention:tismD6nu1.4 Funktionen geben 1 bei Erfolg und 0 bei Fehler zurueck
+// allgemeine Konvention: Funktionen geben 1 bei Erfolg und 0 bei Fehler zurueck
 // bei Funktionen: im if-Zweig Fehlerfall abfragen
 
 int checkAndSendWait(char *getText) {
@@ -17,7 +18,7 @@ int checkAndSendWait(char *getText) {
 	int erg = 0;
 	if(strcmp(getText,"+ WAIT")==0) {
 		snprintf(sendText,10,"OKWAIT");
-		printf("%s\n",sendText);
+		//log_more_info(l,"%s\n",sendText);
 		erg = netWrite(sendText);
 	}
 	return erg;
@@ -33,39 +34,41 @@ void checkMinus(char *buffer) {
 
 
 //Methode gibt bei Fehler 0 zurueck, bei Erfolg 1
-int performConnection(char* gameId, int player) {
+int performConnection(int l, char* gameId, int player) {
 	char sendText[BUF]; 
 	char *getText;
 
 	int i;
 
+	log_info(l, "\n\n");
   // Server: gameserver version
-	netReadLine();
+	log_more_info(l,"S: %s\n",netReadLine());
 
   //Client-Version an Server senden
 	snprintf(sendText,23,"VERSION %s\n",CLIENTVERSION);
+	log_more_info(l,"C: %s",sendText);
 	netWrite(sendText);
-
+	
   //Server: Client-Version vom akzeptiert?
-	netReadLine();
+	log_more_info(l,"S: %s\n", netReadLine());
 
   //Game_ID an Server senden 
 	snprintf(sendText,16,"ID %s\n",gameId);
 	netWrite(sendText);
-	printf("\nGame ID: %s\n",gameId);
+	log_info(l,"Game ID: %s\n",gameId);
    
 	//Server: Welches Spiel?
 	getText = netReadLine();
 	// Fehlermeldung und Beenden vom Client falls Spiel != Quarto 
 	if(strcmp((getText+10),"Quarto")!=0) {
-		printf("Du spielst nicht Quarto, du Depp!");
+		log_error(l,"Du spielst nicht Quarto, du Depp!");
 		exit(EXIT_FAILURE);
 	}
-	printf("%s\n",getText+2);	
+	log_info(l,"%s\n",getText+2);	
 
 	//Server: Game-Name 
 	getText = netReadLine();
-	printf("Name: %s\n",getText+2);
+	log_info(l,"Name: %s\n\n",getText+2);
 
 	// Gewuenschte Spielernummer an Server senden 
 	// optional Spielernummer angeben
@@ -75,48 +78,45 @@ int performConnection(char* gameId, int player) {
 	else {
 		snprintf(sendText,10,"PLAYER\n");
 	}
+	log_more_info(l,"C: %s", sendText);
 	netWrite(sendText);
 
 	//Server: zugeteilte Spielernummer und Name 
 	getText = netReadLine();
 	checkMinus(getText);
 	// schöne Ausgabe
-	printf("\nYou are Player %i (",getText[6]-'0'+1);
+	log_info(l,"You are Player %i (",getText[6]-'0'+1);
 	i=8;
 	while(getText[i] != '\0') {
-		printf("%c",getText[i]);
+		log_info(l,"%c",getText[i]);
 		i++;
 	}
-	printf(")\n");
+	log_info(l,")\n");
 	
 	//Server: Spieleranzahl 
-	netReadLine();
+	log_more_info(l,"S: %s\n", netReadLine());
 
 	//Server: Spieler xy ist (nicht) bereit 
 	netReadLine();
 	
 	// schöne Ausgabe
-	printf("Player %c (",getText[2]);
+	log_info(l,"Player %c (",getText[2]);
 	i=4;
 	while(getText[i+2] != '\0') {
-		printf("%c",getText[i]);
+		log_info(l,"%c",getText[i]);
 		i++;
 	}
-	printf(") is ");
+	log_info(l,") is ");
 	if (getText[i+1] == '1') {
-		printf("ready\n\n");
+		log_info(l,"ready\n\n");
 	} else
 	{
-		printf("not ready\n\n");
+		log_info(l,"not ready\n\n");
 	}
 	
 	//Server: Endplayers 
-	printf("S: %s\n",netReadLine());
+	log_more_info(l,"S: %s\n",netReadLine());
 
-	//Server: wait
-	getText = netReadLine();
-	printf("%s\n",getText);
-	//checkAndSendWait(getText);
 
 	return 0;
 }

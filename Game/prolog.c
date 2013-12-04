@@ -20,16 +20,18 @@
 #define PORT "1357"
 #define HOSTNAME "sysprak.priv.lab.nm.ifi.lmu.de"
 	
-int	performConnection(char *gameId, char player);
+int	performConnection(int l, char *gameId, char player);
 
 // Nutzungsbeschreibung des Clienten
 void help() {
-	printf("\nNutzung des Clients:	client [Game-ID] -p [0|1] -c [dateinname]\n");
-	printf("\n	-p:	gewünschte Spielernummer. 0 für Spieler 1, 1 für Spieler 2\n");
-	printf("	-c:	andere Konfigurationsdatei (Standard: client.conf)\n\n");
+	printf("\nNutzung des Clienten:	client [Game-ID] -p [0|1] -c [dateinname] -l [0|1|2]\n");
+	printf("\n	-p:	gewünschte Spielernummer: 0 für Spieler 1, 1 für Spieler 2\n");
+	printf("	-c:	andere Konfigurationsdatei (Default: client.conf)\n");
+	printf("	-l:	Log-Level: 0 für Errors, 1 für Standardinfo, 2 für mehr Info (Default ist 1)\n\n");
 }
 
 int main(int argc, char *argv[]) {
+	int l = 1; //für logger
 	int ret; //fuer getopt funktion
 	char player = '3';
 	char gameId[15];
@@ -60,7 +62,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	//optional gewunschte Spielernummer und config Dateiname einlesen 
-	while ((ret=getopt(argc, argv, "p:c:")) != -1) {
+	while ((ret=getopt(argc, argv, "p:c:l:")) != -1) {
 	switch (ret) {
 	case 'p':
 		player = optarg[0];
@@ -73,12 +75,15 @@ int main(int argc, char *argv[]) {
 	case 'c':
 		confDateiName[0] = *optarg;
 		break;
+	case 'l':
+		l = atoi(optarg);
+		break;
 	default:
 		help();
 		exit(EXIT_FAILURE);
 	}
 	}
-
+	
 	//Shared-Memory anbinden
 	// shmSegment() um die ID zu erstellen -> vor fork()
 	int shmid = shmSegment();
@@ -100,7 +105,7 @@ int main(int argc, char *argv[]) {
 		//Verbindung mit Server herstellen
 		netConnect(PORT, HOSTNAME);
 
-		performConnection(gameId, player);
+		performConnection(l,gameId, player);
 	
 		//Verbindung zum Server trennen
 		//netDisconnect();
