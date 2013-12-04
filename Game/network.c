@@ -36,8 +36,8 @@ char* netReadLine() {
 		if(bufferGet[i]=='\n') {
 	  	bufferGet[i] = '\0';
 	    bufferEnde = i;
-	   	//printf("S: %s\n",bufferGet);
-	    //fflush(stdout);
+	   	printf("S: %s\n",bufferGet);
+	    fflush(stdout);
 	    return bufferGet;
 	  }
 	}

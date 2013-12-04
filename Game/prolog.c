@@ -20,7 +20,7 @@
 #define PORT "1357"
 #define HOSTNAME "sysprak.priv.lab.nm.ifi.lmu.de"
 	
-int	performConnection(int l, char *gameId, char player);
+int	performConnection(int l,char *gameId, char player, struct shmInfos *shmPtr);
 
 // Nutzungsbeschreibung des Clienten
 void help() {
@@ -89,9 +89,13 @@ int main(int argc, char *argv[]) {
 	int shmid = shmSegment();
 
 	//und shmAnbinden(shmid); um es an den Prozess zu binden.-> muss dann in jeden Prozess einzeln
-	 shmAnbinden(shmid);
-	// einmal Pointer für structure für die shmInfos
-	// einmal Pointer fuer array von structure von playerAttr (fuer die 2 player)
+	struct shmInfos *shmPtr;
+	shmPtr = shmAnbinden(shmid);
+	//shmPtr->eigSpielernummer = 10;
+	//printf("%i",shmPtr->eigSpielernummer);
+
+	//shm automatisch entfernen, wenn alle prozesse detached
+	shmDelete(shmid);
 
 	// zweiten Prozess erstellen.
 	// Connector ist der Kindprozess
@@ -101,17 +105,18 @@ int main(int argc, char *argv[]) {
 		printf ("Fehler bei fork()");
 		break;
 	case 0: // Connector
-		
+			shmPtr->pid1=pid;
 		//Verbindung mit Server herstellen
 		netConnect(PORT, HOSTNAME);
 
-		performConnection(l,gameId, player);
+		performConnection(l, gameId, player, shmPtr);
 	
 		//Verbindung zum Server trennen
 		//netDisconnect();
 		break;
 
 	default: // Thinker
+		shmPtr->pid0=pid;
 		if (wait (NULL) != pid) {
 			printf("Fehler beim Warten auf den Kindprozess");
 			return EXIT_FAILURE;
