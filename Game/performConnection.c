@@ -28,14 +28,14 @@ int checkAndSendWait(char *getText) {
 //Funktion prueft, ob buffer vom Server mit '-' beginnt (wenn ja, wird abgebrochen)
 void checkMinus(char *buffer) {
 	if(buffer[0] == '-') {
-		printf("\n%s\n\n",buffer);
+		printf("\n\n%s\n\n",buffer);
 		exit(EXIT_FAILURE);
 	}
 }
 
 
 //Methode gibt bei Fehler 0 zurueck, bei Erfolg 1
-int performConnection(l, char* gameId, int player, struct shmInfos *shmPtr) {
+int performConnection(int l, char* gameId, int player, struct shmInfos *shmPtr) {
 	char sendText[BUF]; 
 	char *getText;
 
@@ -71,7 +71,7 @@ int performConnection(l, char* gameId, int player, struct shmInfos *shmPtr) {
 
 	//Server: Game-Name 
 	getText = netReadLine();
-	log_info(l,"Name: %s\n\n",getText+2);
+	log_info(l,"\nName: %s\n",getText+2);
 
 	// Gewuenschte Spielernummer an Server senden 
 	// optional Spielernummer angeben
@@ -81,7 +81,7 @@ int performConnection(l, char* gameId, int player, struct shmInfos *shmPtr) {
 	else {
 		snprintf(sendText,10,"PLAYER\n");
 	}
-	log_more_info(l,"C: %s", sendText);
+	log_more_info(l,"\nC: %s", sendText);
 	netWrite(sendText);
 
 	//Server: zugeteilte Spielernummer und Name 
@@ -96,9 +96,9 @@ int performConnection(l, char* gameId, int player, struct shmInfos *shmPtr) {
 	shmPtr->attr[shmPtr->eigSpielernummer].registered = 1;
 	
 	// Ausgabe Versuch Client Spieler
-	printf("SpielernNr Client %i\n",shmPtr->attr[shmPtr->eigSpielernummer].spielerNr);
-	printf("Spielername Client %s\n",shmPtr->attr[shmPtr->eigSpielernummer].name);
-	printf("Spieler Registered Client %i\n",shmPtr->attr[shmPtr->eigSpielernummer].registered);	
+	log_more_info(l,"SpielernNr Client %i\n",shmPtr->attr[shmPtr->eigSpielernummer].spielerNr);
+	log_more_info(l,"Spielername Client %s\n",shmPtr->attr[shmPtr->eigSpielernummer].name);
+	log_more_info(l,"Spieler Registered Client %i\n",shmPtr->attr[shmPtr->eigSpielernummer].registered);	
 	
 	
 	// schöne Ausgabe
@@ -110,6 +110,7 @@ int performConnection(l, char* gameId, int player, struct shmInfos *shmPtr) {
 	}
 	log_info(l,")\n");
 	
+	log_more_info(l,"\n");
 	//Server: Spieleranzahl 
 	getText = netReadLine();
 	log_more_info(l,"S: %s\n", getText);
@@ -126,9 +127,9 @@ int performConnection(l, char* gameId, int player, struct shmInfos *shmPtr) {
 	shmPtr->attr[anzSp].registered = getText[strlen(getText)-1]-'0';
 	// Ausgabe Versuch:
 	
-	printf("SpielernNr Server %i\n",shmPtr->attr[anzSp].spielerNr);
-	printf("Spielername Server %s\n",shmPtr->attr[anzSp].name);
-	printf("Spieler Registered Server %i\n",shmPtr->attr[anzSp].registered);	
+	log_more_info(l,"SpielernNr Server %i\n",shmPtr->attr[anzSp].spielerNr);
+	log_more_info(l,"Spielername Server %s\n",shmPtr->attr[anzSp].name);
+	log_more_info(l,"Spieler Registered Server %i\n",shmPtr->attr[anzSp].registered);	
 	
 	// schöne Ausgabe
 	log_info(l,"Player %c (",getText[2]);
