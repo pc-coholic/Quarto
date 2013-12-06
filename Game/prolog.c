@@ -32,7 +32,8 @@ int main(int argc, char *argv[]) {
 	int ret; //fuer getopt funktion
 	char player = '3';
 	char gameId[15];
-	char confDateiName[256] = "client.conf";
+	char *confDateiName = malloc(256);
+	strcpy(confDateiName, "client.conf");
 
 	pid_t pid;
 	
@@ -62,7 +63,7 @@ int main(int argc, char *argv[]) {
 		}
 		break;
 	case 'c':
-		confDateiName[0] = *optarg;
+		strcpy(confDateiName, optarg);
 		break;
 	case 'l':
 		l = atoi(optarg);
@@ -116,6 +117,7 @@ int main(int argc, char *argv[]) {
 		}
 		break;
 	}
-     
+    
+	free(confDateiName);
 	return 0;
 }
