@@ -8,6 +8,7 @@ struct config
    char hostname[MAXBUF];
    char port[MAXBUF];
    char gametype[MAXBUF];
+   int loglevel;
 };
 
 

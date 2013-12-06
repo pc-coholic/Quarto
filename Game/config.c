@@ -61,6 +61,14 @@ size_t trimwhitespace2(char *out, size_t len, const char *str)
   return out_size;
 }
 
+int trimwhitespace2ToInt(const char *str)
+{
+	char outline[MAXBUF];
+	trimwhitespace2(outline, MAXBUF, str);
+	return atoi(outline);
+
+}
+
 struct config get_config(char *filename)
 {
         struct config configstruct;
@@ -86,7 +94,10 @@ struct config get_config(char *filename)
 									trimwhitespace2(configstruct.port, MAXBUF, ch);
 								} else if (strcmp(confitem, "gametype") == 0) {
 									trimwhitespace2(configstruct.gametype, MAXBUF, ch);
+								} else if (strcmp(confitem, "loglevel") == 0) {
+									configstruct.loglevel = trimwhitespace2ToInt(ch);
 								}
+								
 							
 								confitem = NULL;
 							}

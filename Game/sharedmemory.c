@@ -5,6 +5,7 @@
 #include <sys/shm.h>
 
 #include "sharedmemory.h"
+#include "logger.h"
 
 //#define ANZAHLSPIELER 2
 

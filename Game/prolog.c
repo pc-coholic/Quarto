@@ -16,48 +16,54 @@
 #include "sharedmemory.h"
 #include "network.h"
 #include "config.h"
+#include "logger.h"
 	
-int	performConnection(int l,char *gameId, char player, struct shmInfos *shmPtr);
+int	performConnection(char *gameId, char player, struct shmInfos *shmPtr);
 
 // Nutzungsbeschreibung des Clienten
 void help() {
 	printf("\nNutzung des Clienten:	client [Game-ID] -p [0|1] -c [dateinname] -l [0|1|2]\n");
 	printf("\n	-p:	gewünschte Spielernummer: 0 für Spieler 1, 1 für Spieler 2\n");
 	printf("	-c:	andere Konfigurationsdatei (Default: client.conf)\n");
-	printf("	-l:	Log-Level: 0 für Errors, 1 für Standardinfo, 2 für mehr Info (Default ist 1)\n\n");
+	printf("\n");
 }
 
 int main(int argc, char *argv[]) {
-	int l = 1; //für logger
 	int ret; //fuer getopt funktion
 	char player = '3';
 	char gameId[15];
 	char *confDateiName = malloc(256);
 	strcpy(confDateiName, "client.conf");
-
 	pid_t pid;
 	
+
+    //Config-Datei einlesen und struct betanken
+	log_printf(LOG_PRINTF,"Using config-file %s\n",confDateiName);
+	configstruct = get_config(confDateiName);
+
+	log_printf(LOG_PRINTF,"\n");
+
 	//11-stellige Game-Id aus Kommandozeile auslesen
 	if (argc < 2) {
-		printf("Keine Game-Id angegeben!");
+		log_printf(LOG_ERROR,"Keine Game-Id angegeben!\n");
 		help();
 		exit(EXIT_FAILURE);
 	}
 	strcpy(gameId,argv[1]);
 	
 	if(strlen(gameId) != 11) {
-		printf("Game-Id muss 11-stellig sein!");
+		log_printf(LOG_ERROR,"Game-Id muss 11-stellig sein!\n");
 		help();
 		exit(EXIT_FAILURE);
 	}
 
 	//optional gewunschte Spielernummer und config Dateiname einlesen 
-	while ((ret=getopt(argc, argv, "p:c:l:")) != -1) {
+	while ((ret=getopt(argc, argv, "p:c:")) != -1) {
 	switch (ret) {
 	case 'p':
 		player = optarg[0];
 		if (player!='0' && player != '1') {
-			printf("Es gibt nur 2 Spieler! 0 oder 1 eingeben!");
+			log_printf(LOG_ERROR,"Es gibt nur 2 Spieler! 0 oder 1 eingeben!\n");
 			help();
 			exit(EXIT_FAILURE);
 		}
@@ -65,18 +71,11 @@ int main(int argc, char *argv[]) {
 	case 'c':
 		strcpy(confDateiName, optarg);
 		break;
-	case 'l':
-		l = atoi(optarg);
-		break;
 	default:
 		help();
 		exit(EXIT_FAILURE);
 	}
 	}
-
-    //Config-Datei einlesen und struct betanken
-	printf("Using config-file %s\n",confDateiName);
-	configstruct = get_config(confDateiName);
 
 	//Shared-Memory anbinden
 	// shmSegment() um die ID zu erstellen -> vor fork()
@@ -96,14 +95,14 @@ int main(int argc, char *argv[]) {
 	// Thinker der Elternprozess
 	switch (pid = fork ()) {
 	case -1:
-		printf ("Fehler bei fork()");
+		log_printf (LOG_ERROR,"Fehler bei fork()\n");
 		break;
 	case 0: // Connector
 			shmPtr->pid1=pid;
 		//Verbindung mit Server herstellen
 		netConnect(configstruct.port, configstruct.hostname);
 
-		performConnection(l, gameId, player, shmPtr);
+		performConnection(gameId, player, shmPtr);
 	
 		//Verbindung zum Server trennen
 		//netDisconnect();
@@ -112,7 +111,7 @@ int main(int argc, char *argv[]) {
 	default: // Thinker
 		shmPtr->pid0=pid;
 		if (wait (NULL) != pid) {
-			printf("Fehler beim Warten auf den Kindprozess");
+			log_printf(LOG_ERROR,"Fehler beim Warten auf den Kindprozess\n");
 			return EXIT_FAILURE;
 		}
 		break;

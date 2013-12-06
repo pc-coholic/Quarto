@@ -10,6 +10,7 @@
 #include <arpa/inet.h>
 
 #include "network.h"
+#include "logger.h"
 #define BUF 251
 
 //Hilfsfunktionen
@@ -36,7 +37,7 @@ char* netReadLine() {
 		if(bufferGet[i]=='\n') {
 	  	bufferGet[i] = '\0';
 	    bufferEnde = i;
-	   //	printf("S: %s\n",bufferGet);
+	   	log_printf(LOG_DEBUG,"S: %s\n",bufferGet);
 	   // fflush(stdout);
 	    return bufferGet;
 	  }
@@ -51,7 +52,7 @@ static int netRecv(char* bufAnf, size_t bufRestLen){
 		
 	int len = recv(socke, bufAnf, bufRestLen,0);
 	if(len == -1) {
-		perror("Fehler beim Empfangen von Daten vom Server!");
+		log_printf(LOG_ERROR,"Fehler beim Empfangen von Daten vom Server!\n");
 		return 0;
 	}
 	return len;
@@ -69,10 +70,10 @@ static int netUpdateBuffer(char* bufferGet, int bufferBenutzt, int bufferEnde ) 
 int netWrite(char *bufferSend) {
 	int len = strlen(bufferSend);
 	if(write(socke, bufferSend, len*sizeof(char)) < 0) {
-		perror("Fehler beim Schreiben in den Socket");
+		log_printf(LOG_ERROR,"Fehler beim Schreiben in den Socket\n");
 		return 0;
 	}
-	//printf("C: %s\n",bufferSend);
+	log_printf(LOG_DEBUG,"C: %s",bufferSend);
 	//fflush(stdout);
 	return 1;
 }
@@ -88,7 +89,7 @@ int netConnect(char* port, char* hostname ) {
  
   //Server-Adresse in IP-Adresse umwandeln
   if (getaddrinfo(hostname, port, &hints, &servinfo) != 0) {
-    perror("Fehler beim Servernamen.");
+    log_printf(LOG_ERROR, "Fehler beim Servernamen\n");
     exit(EXIT_FAILURE);
   }
  
@@ -96,19 +97,19 @@ int netConnect(char* port, char* hostname ) {
   for(p = servinfo; p != NULL; p = p->ai_next) {
     // Socket anlegen
     if ((socke = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1) {
-      perror("Socket konnte nicht angelegt werden.");
+      log_printf(LOG_ERROR, "Socket konnte nicht angelegt werden.\n");
         continue;
     }
     // Mit Socket verbinden
     if (connect(socke, p->ai_addr, p->ai_addrlen) == -1) {
       close(socke);
-      perror("Verbindung mit Socket fehlgeschlagen.");
+      log_printf(LOG_ERROR, "Verbindung mit Socket fehlgeschlagen.\n");
       continue;
     }
     break;
   }
 	if (p == NULL) {
-		fprintf(stderr, "Client konnte nicht verbunden worden.\n");
+		log_printf(LOG_ERROR, "Client konnte nicht verbunden werden.\n");
 		exit(EXIT_FAILURE);
 	}
 	freeaddrinfo(servinfo); // all done with this structure

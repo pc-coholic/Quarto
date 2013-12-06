@@ -3,18 +3,18 @@
 #include <stdarg.h>
 #include <unistd.h>
 
+#include "config.h"
+
 #ifndef _LOGGER_H_
 #define _LOGGER_H_
 
 #define LOG_ERROR 0
-#define LOG_INFO 1
-#define LOG_MORE_INFO 2
+#define LOG_PRINTF 1
+#define LOG_DEBUG 2
 
 #define LOG_MAX_MSG_LEN 1024
 
-void log_printf(int log, int level, const char *msg);
-void log_error(int log, const char *fmt, ...);
-void log_info(int log, const char *fmt, ...);
-void log_more_info(int log, const char *fmt, ...);
+// Funktion zum printen: Bei Level eine der oben genannten #defines angeben
+void log_printf(int level, const char *msg, ...);
 
 #endif
