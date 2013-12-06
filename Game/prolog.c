@@ -15,10 +15,7 @@
 
 #include "sharedmemory.h"
 #include "network.h"
-
-#define GAMEKINDNAME "Quarto"
-#define PORT "1357"
-#define HOSTNAME "sysprak.priv.lab.nm.ifi.lmu.de"
+#include "config.h"
 	
 int	performConnection(int l,char *gameId, char player, struct shmInfos *shmPtr);
 
@@ -36,8 +33,6 @@ int main(int argc, char *argv[]) {
 	char player = '3';
 	char gameId[15];
 	char confDateiName[256] = "client.conf";
-	printf("%s",confDateiName);
-	//FILE* configDatei = NULL; 
 
 	pid_t pid;
 	
@@ -48,12 +43,6 @@ int main(int argc, char *argv[]) {
 		exit(EXIT_FAILURE);
 	}
 	strcpy(gameId,argv[1]);
-	
-	// Konfigurationsdatei implementieren fuer Meilenstein 2/1.
-	/*
-	strcpy(dateiName,argv[2]);
-	configDatei = openFile(dateiName);
-	*/
 	
 	if(strlen(gameId) != 11) {
 		printf("Game-Id muss 11-stellig sein!");
@@ -83,7 +72,11 @@ int main(int argc, char *argv[]) {
 		exit(EXIT_FAILURE);
 	}
 	}
-	
+
+    //Config-Datei einlesen und struct betanken
+	printf("Using config-file %s\n",confDateiName);
+	configstruct = get_config(confDateiName);
+
 	//Shared-Memory anbinden
 	// shmSegment() um die ID zu erstellen -> vor fork()
 	int shmid = shmSegment();
@@ -107,7 +100,7 @@ int main(int argc, char *argv[]) {
 	case 0: // Connector
 			shmPtr->pid1=pid;
 		//Verbindung mit Server herstellen
-		netConnect(PORT, HOSTNAME);
+		netConnect(configstruct.port, configstruct.hostname);
 
 		performConnection(l, gameId, player, shmPtr);
 	
