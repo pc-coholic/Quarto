@@ -5,8 +5,8 @@
 
 #include "config.h"
 
-#ifndef _LOGGER_H_
-#define _LOGGER_H_
+#ifndef logger
+#define logger
 
 #define LOG_ERROR 0
 #define LOG_PRINTF 1

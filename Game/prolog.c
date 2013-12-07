@@ -17,6 +17,7 @@
 #include "network.h"
 #include "config.h"
 #include "logger.h"
+#include "prozessSync.h"
 	
 int	performConnection(char *gameId, char player, struct shmInfos *shmPtr);
 
@@ -25,6 +26,7 @@ void help() {
 	printf("\nNutzung des Clienten:	client [Game-ID] -p [0|1] -c [dateinname] -l [0|1|2]\n");
 	printf("\n	-p:	gewünschte Spielernummer: 0 für Spieler 1, 1 für Spieler 2\n");
 	printf("	-c:	andere Konfigurationsdatei (Default: client.conf)\n");
+	printf("	-l:	Loglevel: 0 für Errors, 1 für Spielinfo, 2 für Debuginfo (Default steht in Konfigurationsdatei\n");
 	printf("\n");
 }
 
@@ -35,7 +37,6 @@ int main(int argc, char *argv[]) {
 	char *confDateiName = malloc(256);
 	strcpy(confDateiName, "client.conf");
 	pid_t pid;
-	
 
     //Config-Datei einlesen und struct betanken
 	log_printf(LOG_PRINTF,"Using config-file %s\n",confDateiName);
@@ -45,31 +46,34 @@ int main(int argc, char *argv[]) {
 
 	//11-stellige Game-Id aus Kommandozeile auslesen
 	if (argc < 2) {
-		log_printf(LOG_ERROR,"Keine Game-Id angegeben!\n");
+		printf("Keine Game-Id angegeben!\n");
 		help();
 		exit(EXIT_FAILURE);
 	}
 	strcpy(gameId,argv[1]);
 	
 	if(strlen(gameId) != 11) {
-		log_printf(LOG_ERROR,"Game-Id muss 11-stellig sein!\n");
+		printf("Game-Id muss 11-stellig sein!\n");
 		help();
 		exit(EXIT_FAILURE);
 	}
 
 	//optional gewunschte Spielernummer und config Dateiname einlesen 
-	while ((ret=getopt(argc, argv, "p:c:")) != -1) {
+	while ((ret=getopt(argc, argv, "p:c:l:")) != -1) {
 	switch (ret) {
 	case 'p':
 		player = optarg[0];
 		if (player!='0' && player != '1') {
-			log_printf(LOG_ERROR,"Es gibt nur 2 Spieler! 0 oder 1 eingeben!\n");
+			printf("Es gibt nur 2 Spieler! 0 oder 1 eingeben!\n");
 			help();
 			exit(EXIT_FAILURE);
 		}
 		break;
 	case 'c':
 		strcpy(confDateiName, optarg);
+		break;
+	case 'l':
+		configstruct.loglevel = atoi(optarg);
 		break;
 	default:
 		help();
@@ -93,6 +97,8 @@ int main(int argc, char *argv[]) {
 	// zweiten Prozess erstellen.
 	// Connector ist der Kindprozess
 	// Thinker der Elternprozess
+	
+	start_sync();
 	switch (pid = fork ()) {
 	case -1:
 		log_printf (LOG_ERROR,"Fehler bei fork()\n");
@@ -106,17 +112,39 @@ int main(int argc, char *argv[]) {
 	
 		//Verbindung zum Server trennen
 		//netDisconnect();
+
+	pidNull();
+/*------------------
+      for(i = 0; i < MAX; i++) {
+         kind_wartet();
+         printf("Kind \n");
+         kind2eltern(getppid());
+       }
+      printf("--- Kind Ende ---\n");
+      exit(EXIT_SUCCESS);
+//----------------*/
 		break;
 
 	default: // Thinker
 		shmPtr->pid0=pid;
+	pidelse(pid);
+/* ----------------
+for(j = 0; j < MAX; j++) {
+      printf("Eltern \n");
+      eltern2kind(pid);
+      eltern_warten();
+     }
+   printf("--- Eltern Ende ---\n");
+   return EXIT_SUCCESS;
+//----------------
 		if (wait (NULL) != pid) {
 			log_printf(LOG_ERROR,"Fehler beim Warten auf den Kindprozess\n");
 			return EXIT_FAILURE;
 		}
+*/
 		break;
 	}
-    
+
 	free(confDateiName);
 	return 0;
 }

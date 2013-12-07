@@ -12,5 +12,9 @@ void log_printf(int level, const char *fmt, ...)
     //log(l, LOG_INFO, msg);
     va_end(ap);
 
+    if (level == LOG_ERROR) {
+	printf("\033[1m\033[31m"); //rot und bold
+    }
     printf("%s", msg);
+    printf("\033[0m"); //normale Ausgabe
 }

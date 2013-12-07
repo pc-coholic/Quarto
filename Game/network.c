@@ -37,7 +37,7 @@ char* netReadLine() {
 		if(bufferGet[i]=='\n') {
 	  	bufferGet[i] = '\0';
 	    bufferEnde = i;
-	   	log_printf(LOG_DEBUG,"S: %s\n",bufferGet);
+	   	log_printf(LOG_DEBUG,"\033[1m\033[33m""S: ""\033[0m""%s\n",bufferGet); // bold yellow
 	   // fflush(stdout);
 	    return bufferGet;
 	  }
@@ -73,7 +73,7 @@ int netWrite(char *bufferSend) {
 		log_printf(LOG_ERROR,"Fehler beim Schreiben in den Socket\n");
 		return 0;
 	}
-	log_printf(LOG_DEBUG,"C: %s",bufferSend);
+	log_printf(LOG_DEBUG,"\033[1m\033[36m""C: ""\033[0m""%s",bufferSend); // cyan bold
 	//fflush(stdout);
 	return 1;
 }
