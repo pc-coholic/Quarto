@@ -113,31 +113,14 @@ int main(int argc, char *argv[]) {
 		//Verbindung zum Server trennen
 		//netDisconnect();
 
-	pidNull();
-/*------------------
-      for(i = 0; i < MAX; i++) {
-         kind_wartet();
-         printf("Kind \n");
-         kind2eltern(getppid());
-       }
-      printf("--- Kind Ende ---\n");
-      exit(EXIT_SUCCESS);
-//----------------*/
+		//pidNull();
 		break;
 
 	default: // Thinker
 		shmPtr->pid0=pid;
-	pidelse(pid);
-/* ----------------
-for(j = 0; j < MAX; j++) {
-      printf("Eltern \n");
-      eltern2kind(pid);
-      eltern_warten();
-     }
-   printf("--- Eltern Ende ---\n");
-   return EXIT_SUCCESS;
-//----------------
-		if (wait (NULL) != pid) {
+		//pidelse(pid);
+
+		/*if (wait (NULL) != pid) {
 			log_printf(LOG_ERROR,"Fehler beim Warten auf den Kindprozess\n");
 			return EXIT_FAILURE;
 		}
