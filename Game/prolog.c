@@ -120,11 +120,10 @@ int main(int argc, char *argv[]) {
 		shmPtr->pid0=pid;
 		//pidelse(pid);
 
-		/*if (wait (NULL) != pid) {
+		if (wait (NULL) != pid) {
 			log_printf(LOG_ERROR,"Fehler beim Warten auf den Kindprozess\n");
 			return EXIT_FAILURE;
 		}
-*/
 		break;
 	}
 
