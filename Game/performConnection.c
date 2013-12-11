@@ -145,7 +145,6 @@ int performConnection( char* gameId, int player, struct shmInfos *shmPtr) {
 	}
 
 	//Server: Endplayers 
-
 	return 0;
 }
 

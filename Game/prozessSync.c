@@ -2,6 +2,7 @@
 #include "sharedmemory.h"
 #include "denkmal.h"
 
+extern struct shmInfos *shmPtr;
 //in performConnection einbauen
 // so aufrufen: connector2thinker(getppid());
 void connector2thinker( pid_t pid ) {
@@ -9,13 +10,12 @@ void connector2thinker( pid_t pid ) {
 }
 
 void signalHandler(int signum) {
-	//if (shmPtr->flag == 0) {
-	//	return;
-	//}
-	////Flag setzen
-	//shmPtr->flag = 0;
-	printf("Signal Handler!!!!\n");
-	fflush(stdout);
+	printf("%i",shmPtr->flag);
+	if (shmPtr->flag == 0) {
+		return;
+	}
+	//Flag setzen
+	shmPtr->flag = 0;
 	think();
 }
 

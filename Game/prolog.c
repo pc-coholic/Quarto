@@ -21,6 +21,8 @@
 
 int	performConnection(char *gameId, char player, struct shmInfos *shmPtr);
 
+struct shmInfos *shmPtr; //SHM-Pointer
+
 // Nutzungsbeschreibung des Clienten
 void help() {
 	printf("\nNutzung des Clienten:	client [Game-ID] -p [0|1] -c [dateinname] -l [0|1|2]\n");
@@ -86,7 +88,6 @@ int main(int argc, char *argv[]) {
 	int shmid = shmSegment();
 
 	//und shmAnbinden(shmid); um es an den Prozess zu binden.-> muss dann in jeden Prozess einzeln
-	struct shmInfos *shmPtr;
 	shmPtr = shmAnbinden(shmid);
 
 	//shm automatisch entfernen, wenn alle prozesse detached
