@@ -8,6 +8,8 @@
 #include "network.h"
 #include "logger.h"
 #include "sharedmemory.h"
+#include "denkmal.h"
+#include "prozessSync.h"
 
 #define CLIENTVERSION "1.42"
 #define BUF 251
@@ -141,7 +143,7 @@ int performConnection( char* gameId, int player, struct shmInfos *shmPtr) {
 	{
 		log_printf(LOG_PRINTF,"not ready\n\n");
 	}
-	
+
 	//Server: Endplayers 
 
 	return 0;

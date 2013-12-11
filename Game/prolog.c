@@ -18,7 +18,7 @@
 #include "config.h"
 #include "logger.h"
 #include "prozessSync.h"
-	
+
 int	performConnection(char *gameId, char player, struct shmInfos *shmPtr);
 
 // Nutzungsbeschreibung des Clienten
@@ -88,8 +88,6 @@ int main(int argc, char *argv[]) {
 	//und shmAnbinden(shmid); um es an den Prozess zu binden.-> muss dann in jeden Prozess einzeln
 	struct shmInfos *shmPtr;
 	shmPtr = shmAnbinden(shmid);
-	//shmPtr->eigSpielernummer = 10;
-	//printf("%i",shmPtr->eigSpielernummer);
 
 	//shm automatisch entfernen, wenn alle prozesse detached
 	shmDelete(shmid);
@@ -98,27 +96,29 @@ int main(int argc, char *argv[]) {
 	// Connector ist der Kindprozess
 	// Thinker der Elternprozess
 	
-	start_sync();
 	switch (pid = fork ()) {
 	case -1:
 		log_printf (LOG_ERROR,"Fehler bei fork()\n");
 		break;
 	case 0: // Connector
-			shmPtr->pid1=pid;
+		shmPtr->pid1=pid;
 		//Verbindung mit Server herstellen
 		netConnect(configstruct.port, configstruct.hostname);
-
+		
 		performConnection(gameId, player, shmPtr);
 	
 		//Verbindung zum Server trennen
 		//netDisconnect();
 
-		//pidNull();
 		break;
 
 	default: // Thinker
 		shmPtr->pid0=pid;
-		//pidelse(pid);
+
+		signal(SIGUSR1, signalHandler);
+		
+		// Auf signal warten	
+    pause();
 
 		if (wait (NULL) != pid) {
 			log_printf(LOG_ERROR,"Fehler beim Warten auf den Kindprozess\n");

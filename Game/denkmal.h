@@ -6,11 +6,9 @@
 
 #include "logger.h"
 
-#ifndef prozesssync
-#define prozesssync
 
-#define MAX 5
-
-void connector2thinker(pid_t pid);
-void signalHandler();
+#ifndef	nachdenk 
+#define nachdenk 
+	void think();
 #endif
+

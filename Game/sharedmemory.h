@@ -13,8 +13,9 @@ struct shmInfos{
 	char spielname[30]; // kann nur 30 Zeichen lang sein
 	int eigSpielernummer;
 	int anzahlSpieler;
-	int pid0;
-	int pid1;
+	int pid0; //Thinker
+	int pid1; //Connector
+	int flag; // 0, wenn kein neues Feld benötigt wird, 1, wenn schon
 	struct playerAttr attr[ANZAHLSPIELER];
 };
 
