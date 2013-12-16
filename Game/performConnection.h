@@ -16,7 +16,6 @@
 
 #ifndef	prfrmCnnctn
 #define prfrmCnnctn
-	int performConnection( char* gameId, int player, struct shmInfos *shmPtr);
 	void checkMinus();
 	void sendVersion();
 	void sendGameId(char* gameId);
