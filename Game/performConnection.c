@@ -1,18 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/socket.h>
+#include "performConnection.h"
 
-#include "network.h"
-#include "logger.h"
-#include "sharedmemory.h"
-#include "denkmal.h"
-#include "prozessSync.h"
-
-#define CLIENTVERSION "1.42"
-#define BUF 251
 // allgemeine Konvention: Funktionen geben 1 bei Erfolg und 0 bei Fehler zurueck
 // bei Funktionen: im if-Zweig Fehlerfall abfragen
 
@@ -35,32 +22,21 @@ void checkMinus(char *buffer) {
 	}
 }
 
-
-//Methode gibt bei Fehler 0 zurueck, bei Erfolg 1
-int performConnection( char* gameId, int player, struct shmInfos *shmPtr) {
-	char sendText[BUF]; 
-	char *getText;
-
-	int i;
-
-	log_printf(LOG_PRINTF, "\n");
-  // Server: gameserver version
-	netReadLine();
-
-  //Client-Version an Server senden
+void sendVersion() {
+	char sendText[BUF];
 	snprintf(sendText,23,"VERSION %s\n",CLIENTVERSION);
 	netWrite(sendText);
-	
-  //Server: Client-Version vom akzeptiert?
-	netReadLine();
+}
 
-  //Game_ID an Server senden 
+void sendGameId(char* gameId) {
+	char sendText[BUF];
 	snprintf(sendText,16,"ID %s\n",gameId);
 	netWrite(sendText);
 	log_printf(LOG_PRINTF,"Game ID: %s\n",gameId);
-   
+}
+
+void parseGamekind(char* getText, struct shmInfos *shmPtr) {
 	//Server: Welches Spiel?
-	getText = netReadLine();
 	log_printf(LOG_PRINTF,"%s\n\n",getText+2);	
 	// Spielname in shmInfo eintragen
 	strcpy(shmPtr->spielname,getText);
@@ -73,7 +49,12 @@ int performConnection( char* gameId, int player, struct shmInfos *shmPtr) {
 	//Server: Game-Name 
 	getText = netReadLine();
 	log_printf(LOG_PRINTF,"Name: %s\n",getText+2);
+}
 
+void sendPlayer(int player, struct shmInfos *shmPtr) {
+	char sendText[BUF]; 
+	char *getText;
+	int i;
 	// Gewuenschte Spielernummer an Server senden 
 	// optional Spielernummer angeben
 	if (player!='3') {
@@ -143,8 +124,36 @@ int performConnection( char* gameId, int player, struct shmInfos *shmPtr) {
 	{
 		log_printf(LOG_PRINTF,"not ready\n\n");
 	}
-
-	//Server: Endplayers 
-	return 0;
 }
 
+void parseMovetimeout(char* getText, struct shmInfos *shmPtr) {
+	//ToDo: Movetimeout ins SHM schreiben?
+}
+
+void parseNext(char* getText, struct shmInfos *shmPtr) {
+	//ToDo: Naechsten Stein ins SHM schreiben
+}
+
+void parseField(char* getText, struct shmInfos *shmPtr) {
+	//ToDo: Spielfeldgroesse korrekt parsen
+	for (int i = 0; i < getText[8]-'0'; i++) {
+		getText = netReadLine();
+	}
+}
+
+void sendThinking() {
+	char sendText[BUF];
+	snprintf(sendText,12,"THINKING\n");
+	netWrite(sendText);
+}
+
+void parseGameover(char* getText) {
+	//ToDo: Gewinner parsen
+	printf("You lost the game. Or won. Whatever\n");
+}
+
+void sendMove(char* block, int nextblock) {
+	char sendText[BUF];
+	snprintf(sendText,15,"PLAY %s,%i\n", block, nextblock);
+	netWrite(sendText);
+}

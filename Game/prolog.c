@@ -18,8 +18,8 @@
 #include "config.h"
 #include "logger.h"
 #include "prozessSync.h"
+#include "performConnection.h"
 
-int	performConnection(char *gameId, char player, struct shmInfos *shmPtr);
 
 struct shmInfos *shmPtr; //SHM-Pointer
 
@@ -96,7 +96,6 @@ int main(int argc, char *argv[]) {
 	// zweiten Prozess erstellen.
 	// Connector ist der Kindprozess
 	// Thinker der Elternprozess
-	
 	switch (pid = fork ()) {
 	case -1:
 		log_printf (LOG_ERROR,"Fehler bei fork()\n");
@@ -106,10 +105,56 @@ int main(int argc, char *argv[]) {
 		//Verbindung mit Server herstellen
 		netConnect(configstruct.port, configstruct.hostname);
 		
-		performConnection(gameId, player, shmPtr);
-	
-		//Verbindung zum Server trennen
-		//netDisconnect();
+		//performConnection(gameId, player, shmPtr);
+
+		while (1 == 1) {
+			char *getText;
+			char testText[6];
+
+			getText = netReadLine();
+			printf("%s\n", getText);
+			strncpy(testText, getText, 6);
+			if (strcmp(testText, "+ MNM ") == 0) {
+				//+ MNM Gameserver v1.0 accepting connections
+				sendVersion();
+			} else if (strcmp(testText, "+ Clie") == 0) {
+				//+ Client version accepted - please send Game-ID to join
+				sendGameId(gameId);
+			} else if (strcmp(testText, "+ PLAY") == 0) {
+				//+ PLAYING Quarto
+				parseGamekind(getText, shmPtr);
+				sendPlayer(player, shmPtr);
+			} else if (strcmp(testText, "+ ENDP") == 0) {
+				//+ ENDPLAYERS
+				//noop
+			} else if (strcmp(testText, "+ MOVE") == 0) {
+				//+ MOVE 3000
+				parseMovetimeout(getText, shmPtr);
+			} else if (strcmp(testText, "+ NEXT") == 0) {
+				//+ NEXT 7
+				parseNext(getText, shmPtr);
+			} else if (strcmp(testText, "+ FIEL") == 0) {
+				//+ FIELD 4,4
+				parseField(getText, shmPtr);
+			} else if (strcmp(testText, "+ ENDF") == 0) {
+				//+ ENDFIELD
+				sendThinking();
+				//Hier Zug berechnen und per sendMove(stein, naechsterstein) senden
+			} else if (strcmp(testText, "+ GAME") == 0) {
+				//+ GAMEOVER [[ hh Spielernummer des Gewinners ii hh Spielername des Gewinners ii ]]
+				parseGameover(getText);
+				parseField(getText, shmPtr);
+			} else if (strcmp(testText, "+ QUIT") == 0) {
+				//+ QUIT
+				//netDisconnect();
+				break;
+			} else if (strcmp(testText, "- Sock") == 0) {
+				//- Socket timeout - please be quicker next time
+				//Well, fuck.
+				//netDiscconnect();
+				break;
+			}
+		}
 
 		break;
 
