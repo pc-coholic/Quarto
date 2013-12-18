@@ -1,6 +1,6 @@
 #include "denkmal.h"
 
 void think() {
-	printf("Denk, denk, denk ...");
+	printf("\nDenk, denk, denk ...");
 	fflush(stdout);
 }

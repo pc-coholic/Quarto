@@ -21,7 +21,7 @@
 #include "performConnection.h"
 
 
-struct shmInfos *shmPtr; //SHM-Pointer
+struct shmInfos *shmPtr = NULL; //SHM-Pointer
 
 // Nutzungsbeschreibung des Clienten
 void help() {
@@ -83,14 +83,14 @@ int main(int argc, char *argv[]) {
 	}
 	}
 
-	//Shared-Memory anbinden
+	//Shared-Memory erstellen 
 	// shmSegment() um die ID zu erstellen -> vor fork()
 	int shmid = shmSegment();
 
-	//und shmAnbinden(shmid); um es an den Prozess zu binden.-> muss dann in jeden Prozess einzeln
+	//und shmAnbinden(shmid); um es an den Prozess zu binden
 	shmPtr = shmAnbinden(shmid);
 
-	//shm automatisch entfernen, wenn alle prozesse detached
+	//shm automatisch entfernen, wenn alle prozesse detached sind
 	shmDelete(shmid);
 
 	// zweiten Prozess erstellen.
@@ -105,8 +105,6 @@ int main(int argc, char *argv[]) {
 		//Verbindung mit Server herstellen
 		netConnect(configstruct.port, configstruct.hostname);
 		
-		//performConnection(gameId, player, shmPtr);
-
 		while (1 == 1) {
 			char *getText;
 			char testText[6];
@@ -163,8 +161,8 @@ int main(int argc, char *argv[]) {
 
 		signal(SIGUSR1, signalHandler);
 		
-		// Auf signal warten	
-    pause();
+		// Auf Signal warten	
+		 pause();
 
 		if (wait (NULL) != pid) {
 			log_printf(LOG_ERROR,"Fehler beim Warten auf den Kindprozess\n");

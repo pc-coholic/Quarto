@@ -1,5 +1,5 @@
 #include "performConnection.h"
-
+extern struct shmInfos* shmPtr;
 // allgemeine Konvention: Funktionen geben 1 bei Erfolg und 0 bei Fehler zurueck
 // bei Funktionen: im if-Zweig Fehlerfall abfragen
 
@@ -145,6 +145,9 @@ void sendThinking() {
 	char sendText[BUF];
 	snprintf(sendText,12,"THINKING\n");
 	netWrite(sendText);
+	//Flag setzen und dem Thinker Bescheide geben
+	shmPtr->flag = 1;
+	connector2thinker(getppid());
 }
 
 void parseGameover(char* getText) {
