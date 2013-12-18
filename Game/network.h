@@ -9,6 +9,7 @@ int netDisconnet();
 char* netReadLine();
 //dem Server eine Zeile ins Socket schreiben
 int netWrite(char *bufferSend);
-
+//socket fd auslesen
+int getSocketFd();
 #endif
 

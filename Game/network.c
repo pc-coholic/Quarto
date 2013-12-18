@@ -116,3 +116,8 @@ int netConnect(char* port, char* hostname ) {
 	
 	return 1;
 }
+
+int getSocketFd(){
+	return socke;
+}
+

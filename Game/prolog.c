@@ -19,7 +19,7 @@
 #include "logger.h"
 #include "prozessSync.h"
 #include "performConnection.h"
-
+#include "pipe.h"
 
 struct shmInfos *shmPtr = NULL; //SHM-Pointer
 
@@ -92,6 +92,13 @@ int main(int argc, char *argv[]) {
 
 	//shm automatisch entfernen, wenn alle prozesse detached sind
 	shmDelete(shmid);
+	
+	// Pipe anlegen
+	int pipe_fd[2];
+	if(pipe(pipe_fd)<0){
+	
+		log_printf(LOG_ERROR,"Fehler bei Pipe anlegen");
+	};
 
 	// zweiten Prozess erstellen.
 	// Connector ist der Kindprozess
@@ -102,9 +109,11 @@ int main(int argc, char *argv[]) {
 		break;
 	case 0: // Connector
 		shmPtr->pid1=pid;
+			
+
 		//Verbindung mit Server herstellen
 		netConnect(configstruct.port, configstruct.hostname);
-		
+
 		while (1 == 1) {
 			char *getText;
 			char testText[6];
@@ -138,6 +147,15 @@ int main(int argc, char *argv[]) {
 				//+ ENDFIELD
 				sendThinking();
 				//Hier Zug berechnen und per sendMove(stein, naechsterstein) senden
+				if(ueberwacheFd(pipe_fd)==1){
+					//sendMove(stein,naechsterstein);
+					printf("Gandalf (PIPE) hat gesprochen und wurde vor dem ertrinken gerettet!\n");
+				}
+				else{
+					printf("Gandalf ist ersoffen\n");
+				}
+				
+				
 			} else if (strcmp(testText, "+ GAME") == 0) {
 				//+ GAMEOVER [[ hh Spielernummer des Gewinners ii hh Spielername des Gewinners ii ]]
 				parseGameover(getText);
@@ -157,13 +175,17 @@ int main(int argc, char *argv[]) {
 		break;
 
 	default: // Thinker
+		
 		shmPtr->pid0=pid;
 
 		signal(SIGUSR1, signalHandler);
-		
 		// Auf Signal warten	
-		 pause();
-
+		pause();
+			
+		// In die Pipe schreiben
+			pipe_write(pipe_fd);
+		
+			
 		if (wait (NULL) != pid) {
 			log_printf(LOG_ERROR,"Fehler beim Warten auf den Kindprozess\n");
 			return EXIT_FAILURE;
