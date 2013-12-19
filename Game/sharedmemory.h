@@ -17,6 +17,9 @@ struct shmInfos{
 	int pid1; //Connector
 	int flag; // 0, wenn kein neues Feld benötigt wird, 1, wenn schon
 	struct playerAttr attr[ANZAHLSPIELER];
+	int breite;
+	int hoehe;
+	int spielfeldGroesse;	
 };
 
 //Shared Memory Segment erstellen 
