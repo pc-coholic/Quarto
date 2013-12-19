@@ -20,6 +20,7 @@
 #include "prozessSync.h"
 #include "performConnection.h"
 #include "pipe.h"
+#include "ausgabe.h"
 
 struct shmInfos *shmPtr = NULL; //SHM-Pointer
 
@@ -41,7 +42,7 @@ int main(int argc, char *argv[]) {
 	pid_t pid;
 
     //Config-Datei einlesen und struct betanken
-	log_printf(LOG_PRINTF,"Using config-file %s\n",confDateiName);
+	log_printf(LOG_DEBUG,"Using config-file %s\n",confDateiName);
 	configstruct = get_config(confDateiName);
 
 	log_printf(LOG_PRINTF,"\n");
@@ -119,7 +120,7 @@ int main(int argc, char *argv[]) {
 			char testText[6];
 
 			getText = netReadLine();
-			printf("%s\n", getText);
+			//printf("%s\n", getText);
 			strncpy(testText, getText, 6);
 			if (strcmp(testText, "+ MNM ") == 0) {
 				//+ MNM Gameserver v1.0 accepting connections
@@ -172,6 +173,7 @@ int main(int argc, char *argv[]) {
 			}
 		}
 
+		printField();
 		break;
 
 	default: // Thinker
@@ -184,7 +186,7 @@ int main(int argc, char *argv[]) {
 			
 		// In die Pipe schreiben
 			pipe_write(pipe_fd);
-		
+
 			
 		if (wait (NULL) != pid) {
 			log_printf(LOG_ERROR,"Fehler beim Warten auf den Kindprozess\n");

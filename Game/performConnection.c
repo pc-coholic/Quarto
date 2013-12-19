@@ -152,7 +152,7 @@ void sendThinking() {
 
 void parseGameover(char* getText) {
 	//ToDo: Gewinner parsen
-	printf("You lost the game. Or won. Whatever\n");
+	log_printf(LOG_PRINTF,"You lost the game. Or won. Whatever\n");
 }
 
 void sendMove(char* block, int nextblock) {

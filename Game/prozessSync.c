@@ -10,7 +10,6 @@ void connector2thinker( pid_t pid ) {
 }
 
 void signalHandler(int signum) {
-	printf("%i",shmPtr->flag);
 	if (shmPtr->flag == 0) {
 		return;
 	}

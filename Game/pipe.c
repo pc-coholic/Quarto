@@ -42,7 +42,6 @@ int ueberwacheFd(int pipe_fd[]){
 		max = socket_fd;
 	}
 	int ret = select(max+1,&set,NULL,NULL,NULL);
-	printf("Select ausgefuehrt\n");
 	
 	if (ret == 1) {
 		if (FD_ISSET(pipe_fd[READ],&set)) {
@@ -55,10 +54,4 @@ int ueberwacheFd(int pipe_fd[]){
 		}
 		return 2;
 	}
-	
-
-
-
-
-
 	
