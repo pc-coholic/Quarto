@@ -86,7 +86,7 @@ int main(int argc, char *argv[]) {
 
 	//Shared-Memory erstellen 
 	// shmSegment() um die ID zu erstellen -> vor fork()
-	int shmid = shmSegment();
+	int shmid = shmSegment(sizeof(struct shmInfos));
 
 	//und shmAnbinden(shmid); um es an den Prozess zu binden
 	shmPtr = shmAnbinden(shmid);
@@ -143,7 +143,7 @@ int main(int argc, char *argv[]) {
 				parseNext(getText, shmPtr);
 			} else if (strcmp(testText, "+ FIEL") == 0) {
 				//+ FIELD 4,4
-				parseField(getText, shmPtr);
+				parseField(getText);
 			} else if (strcmp(testText, "+ ENDF") == 0) {
 				//+ ENDFIELD
 				sendThinking();
@@ -160,7 +160,7 @@ int main(int argc, char *argv[]) {
 			} else if (strcmp(testText, "+ GAME") == 0) {
 				//+ GAMEOVER [[ hh Spielernummer des Gewinners ii hh Spielername des Gewinners ii ]]
 				parseGameover(getText);
-				parseField(getText, shmPtr);
+				parseField(getText);
 			} else if (strcmp(testText, "+ QUIT") == 0) {
 				//+ QUIT
 				//netDisconnect();

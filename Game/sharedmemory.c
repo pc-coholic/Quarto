@@ -11,9 +11,9 @@
 // Shared Memory Segment wird erstellt und der ID des gemeinsamen Speicherbereichs zugewiesen
 // Groesse des SHM: struktur + Eigenschaften von jedem Spieler (wieviele Spieler?)
 //erstmal fuer 2 Spieler (bis Loesung fuer shm-vergroesserung oder aehnliches
-int shmSegment(){
+int shmSegment(int size){
 	int shmid;
-	if((shmid = shmget(IPC_PRIVATE, sizeof(struct shmInfos), IPC_CREAT | 0666) )==-1){
+	if((shmid = shmget(IPC_PRIVATE, sizeof(size), IPC_CREAT | 0666) )==-1){
 	perror("Fehler beim Segment erstellen");
 	}
 	return shmid;
@@ -31,6 +31,15 @@ struct shmInfos* shmAnbinden(int shmid){
 	}
 	return shm_ptr;
 }
+
+struct shmSpielfeld* shmSpielfeldAnbinden(int shmid){
+	struct shmSpielfeld *shm_ptr_Sf = shmat(shmid, NULL, 0); //attach
+	if (shm_ptr_Sf==(struct shmSpielfeld*)-1) {
+		perror("Fehler beim Binden des SHM an einen Prozess");
+	}
+	return shm_ptr_Sf;
+}
+
 
 // Segment wieder löschen, wenn sich der letzte Prozess detached (nach! dem ersten attach ausführen)
 void shmDelete(int shmid){

@@ -23,7 +23,7 @@
 	void sendPlayer(int player, struct shmInfos *shmPtr);
 	void parseMovetimeout(char* getText, struct shmInfos *shmPtr);
 	void parseNext(char* getText, struct shmInfos *shmPtr);
-	void parseField(char* getText, struct shmInfos *shmPtr);
+	void parseField(char* getText);
 	void sendThinking();
 	void parseGameover(char* getText);
 #endif

@@ -128,13 +128,19 @@ void sendPlayer(int player, struct shmInfos *shmPtr) {
 
 void parseMovetimeout(char* getText, struct shmInfos *shmPtr) {
 	//ToDo: Movetimeout ins SHM schreiben?
+	int time = atoi(getText+7);
+	shmPtr->moveTimeout = time;
 }
 
 void parseNext(char* getText, struct shmInfos *shmPtr) {
 	//ToDo: Naechsten Stein ins SHM schreiben
+	int next = atoi(getText+7);
+	shmPtr->nextStone = next;
 }
 
-void parseField(char* getText, struct shmInfos *shmPtr) {
+void parseField(char* getText) {
+	struct shmSpielfeld *shmPtr_Sf = NULL;
+	
 	//ToDo: Spielfeldgroesse korrekt parsen
 	int len = strlen(getText);
 	char breiteChar[20];
@@ -152,11 +158,15 @@ void parseField(char* getText, struct shmInfos *shmPtr) {
 	printf("Breite %i\n",breite);
 	printf("Hoehe %i\n",hoehe);
 	
-	shmPtr->breite = breite;
-	shmPtr->hoehe = hoehe;
-	shmPtr->spielfeldGroesse = breite*hoehe;
-	log_printf(LOG_DEBUG,"Hoehe im Shared Memory: %i\n",shmPtr->hoehe);
-	log_printf(LOG_DEBUG,"Breite im Shared Memory: %i\n",shmPtr->breite);
+	// Shared Memory Bereich fuer das Spielfeld anlegen
+	int shmid_Sf = shmSegment(hoehe*breite*sizeof(int));
+	shmPtr_Sf = shmSpielfeldAnbinden(shmid_Sf);
+	
+	shmPtr_Sf->breite = breite;
+	shmPtr_Sf->hoehe = hoehe;
+
+	log_printf(LOG_DEBUG,"Hoehe im Shared Memory: %i\n",shmPtr_Sf->hoehe);
+	log_printf(LOG_DEBUG,"Breite im Shared Memory: %i\n",shmPtr_Sf->breite);
 	}		
 
 void sendThinking() {
