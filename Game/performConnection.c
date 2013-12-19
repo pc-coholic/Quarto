@@ -39,7 +39,7 @@ void parseGamekind(char* getText, struct shmInfos *shmPtr) {
 	//Server: Welches Spiel?
 	log_printf(LOG_PRINTF,"%s\n\n",getText+2);	
 	// Spielname in shmInfo eintragen
-	strcpy(shmPtr->spielname,getText);
+	strcpy(shmPtr->spielname,getText);  // Tragen wir hier in den Spielnamen + PLAYING Quarto ein? 
 	// Fehlermeldung und Beenden vom Client falls Spiel != Quarto 
 	if(strcmp((getText+10),"Quarto")!=0) {
 		log_printf(LOG_ERROR,"Du spielst nicht Quarto, du Depp!");
@@ -136,10 +136,28 @@ void parseNext(char* getText, struct shmInfos *shmPtr) {
 
 void parseField(char* getText, struct shmInfos *shmPtr) {
 	//ToDo: Spielfeldgroesse korrekt parsen
-	for (int i = 0; i < getText[8]-'0'; i++) {
-		getText = netReadLine();
-	}
-}
+	int len = strlen(getText);
+	char breiteChar[20];
+	int i;
+	for (i = 0; i < len; i++) {
+		if(getText[i] != ','){
+		breiteChar[i] = getText[i];
+		}
+	}	
+	int lenB = strlen(breiteChar);	
+	
+	int hoehe = atoi(getText+lenB+1);
+	int breite = atoi(breiteChar+8);
+	
+	printf("Breite %i\n",breite);
+	printf("Hoehe %i\n",hoehe);
+	
+	shmPtr->breite = breite;
+	shmPtr->hoehe = hoehe;
+	shmPtr->spielfeldGroesse = breite*hoehe;
+	log_printf(LOG_DEBUG,"Hoehe im Shared Memory: %i\n",shmPtr->hoehe);
+	log_printf(LOG_DEBUG,"Breite im Shared Memory: %i\n",shmPtr->breite);
+	}		
 
 void sendThinking() {
 	char sendText[BUF];
