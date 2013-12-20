@@ -23,7 +23,7 @@
 #include "spielfeldAusgabe.h"
 
 struct shmInfos *shmPtr = NULL; //SHM-Pointer
-struct shmSpielfeld *shmPtr_Sf = NULL;
+int *shmPtr_Sf = NULL;
 
 // Nutzungsbeschreibung des Clienten
 void help() {

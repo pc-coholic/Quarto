@@ -19,20 +19,18 @@ struct shmInfos{
 	struct playerAttr attr[ANZAHLSPIELER];
 	int moveTimeout;
 	int nextStone;
-};
-
-struct shmSpielfeld{
 	int breite;
 	int hoehe;
-	int *spielfeld[4*4];
 };
+
+int *spielfeld;
 
 
 //Shared Memory Segment erstellen 
 int shmSegment(int size);
 //Shared Memory Bereich an die shmId anbinden
 struct shmInfos* shmAnbinden(int shmid);
-struct shmSpielfeld* shmSpielfeldAnbinden(int shmid);
+int *shmSpielfeldAnbinden(int shmid);
 //Segment Loeschen bei Prozessende
 void shmDelete(int shmid);
 

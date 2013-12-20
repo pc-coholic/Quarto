@@ -3,7 +3,7 @@ extern struct shmInfos* shmPtr;
 // allgemeine Konvention: Funktionen geben 1 bei Erfolg und 0 bei Fehler zurueck
 // bei Funktionen: im if-Zweig Fehlerfall abfragen
 
-static void saveField(struct shmSpielfeld* shmPtr_Sf, char *getText);
+static void saveField(int* shmPtr_Sf, char *getText);
 
 int checkAndSendWait(char *getText) {
 	char sendText[BUF];
@@ -140,8 +140,8 @@ void parseNext(char* getText, struct shmInfos *shmPtr) {
 	shmPtr->nextStone = next;
 }
 
-struct shmSpielfeld* parseField(char* getText) {
-	struct shmSpielfeld *shmPtr_Sf = NULL;
+int* parseField(char* getText) {
+	int *shmPtr_Sf = NULL;
 	
 	//ToDo: Spielfeldgroesse korrekt parsen
 	int len = strlen(getText);
@@ -164,17 +164,17 @@ struct shmSpielfeld* parseField(char* getText) {
 	shmPtr_Sf = shmSpielfeldAnbinden(shmid_Sf);
 	shmDelete(shmid_Sf);
 	
-	shmPtr_Sf->breite = breite;
-	shmPtr_Sf->hoehe = hoehe;
+	shmPtr->breite = breite;
+	shmPtr->hoehe = hoehe;
 
-	log_printf(LOG_DEBUG,"Hoehe im Shared Memory: %i\n",shmPtr_Sf->hoehe);
-	log_printf(LOG_DEBUG,"Breite im Shared Memory: %i\n",shmPtr_Sf->breite);
+	log_printf(LOG_DEBUG,"Hoehe im Shared Memory: %i\n",shmPtr->hoehe);
+	log_printf(LOG_DEBUG,"Breite im Shared Memory: %i\n",shmPtr->breite);
 
 	getText = netReadLine();
 	saveField(shmPtr_Sf,getText);
-	int bla[10];	
-	for (int i; i<10; i++) {
-		printf("%i ",bla[i]);
+
+	for(int i=0; i<16; i++) {
+		printf("%i ",shmPtr_Sf[i]);
 	}
 	printf("\n");
 
@@ -202,8 +202,8 @@ void sendMove(char* block, int nextblock) {
 }
 
 //Spielfeld in shm speichern
-void saveField(struct shmSpielfeld* shmPtr_Sf, char *getText) {
-        int breite = shmPtr_Sf->breite;
+void saveField(int* shmPtr_Sf, char *getText) {
+        int breite = shmPtr->breite;
 	char charHelp[255];
         int i = 2;
         int j =0;
@@ -214,15 +214,13 @@ void saveField(struct shmSpielfeld* shmPtr_Sf, char *getText) {
 	}
 	charHelp[j] = '\0';
 	
-	int hoehe = breite-atoi(charHelp);
-        int currentField = hoehe*breite;
-	int spielfeld[16];
-	log_printf(LOG_DEBUG,"Test in saveField: %i\n",spielfeld[0]);
+	int zeile = breite-atoi(charHelp);
+        int currentField = zeile*breite;
 	while (breite) {
                 if (getText[i] == '*') {
-                        spielfeld[currentField]= -1;
+                        shmPtr_Sf[currentField]= -1;
 		}
-		else {
+		else if(getText[i] !=' ') {
 			j=0;
 			while(getText[i] != ' ') {
 				charHelp[j] = getText[i];
@@ -231,8 +229,10 @@ void saveField(struct shmSpielfeld* shmPtr_Sf, char *getText) {
 			}
 			charHelp[j] = '\0';
 
-			spielfeld[currentField] = atoi(charHelp);
+			shmPtr_Sf[currentField] = atoi(charHelp);
+			
 		}
+		currentField++;
 		i++;
 		breite--;
 	}

@@ -1,15 +1,15 @@
 #include "spielfeldAusgabe.h"
 
-//extern struct shmSpielfeld *shmPtr_Sf;
+extern struct shmInfos *shmPtr;
 
 static void printSpaltenNamen(int breite);
 static void printMultiZeichen(int breite,char beginEnd,char between);
 static void printSteinNummern(int field[], int breite,int currentPlace);
 
 //Spielfeld ausgabe
-void printField(struct shmSpielfeld* shmPtr_Sf) {
-	int breite= shmPtr_Sf->breite;
-	int hoehe = shmPtr_Sf->hoehe;
+void printField(int* shmPtr_Sf) {
+	int breite= shmPtr->breite;
+	int hoehe = shmPtr->hoehe;
 	int field[17] = { 9, 7, -1, 8, 3, -1, 2, -1, 15, -1, 6, 4, -1, 11, -1, 10 };
 	int currentPlace = 0;
 	
@@ -49,8 +49,8 @@ void printField(struct shmSpielfeld* shmPtr_Sf) {
 }
 
 //Spielstein in binärdastellung
-void printSpielstein(struct shmSpielfeld* shmPtr_Sf,int i) {
-	int breite = shmPtr_Sf->breite;
+void printSpielstein(int* shmPtr_Sf,int i) {
+	int breite = shmPtr->breite;
 	while (breite) {
 		if (i & 1) {
 			log_printf(LOG_PRINTF,"\033[41m"" ");

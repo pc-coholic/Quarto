@@ -32,9 +32,9 @@ struct shmInfos* shmAnbinden(int shmid){
 	return shm_ptr;
 }
 
-struct shmSpielfeld* shmSpielfeldAnbinden(int shmid){
-	struct shmSpielfeld *shm_ptr_Sf = shmat(shmid, NULL, 0); //attach
-	if (shm_ptr_Sf==(struct shmSpielfeld*)-1) {
+int* shmSpielfeldAnbinden(int shmid){
+	int *shm_ptr_Sf = shmat(shmid, NULL, 0); //attach
+	if (shm_ptr_Sf==(int*)-1) {
 		perror("Fehler beim Binden des SHM an einen Prozess");
 	}
 	return shm_ptr_Sf;
