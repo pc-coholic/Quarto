@@ -10,7 +10,8 @@ static void printSteinNummern(int field[], int breite,int currentPlace);
 void printField(int* shmPtr_Sf) {
 	int breite= shmPtr->breite;
 	int hoehe = shmPtr->hoehe;
-	int field[17] = { 9, 7, -1, 8, 3, -1, 2, -1, 15, -1, 6, 4, -1, 11, -1, 10 };
+	int *field = shmPtr_Sf;
+//	int field[17] = { 9, 7, -1, 8, 3, -1, 2, -1, 15, -1, 6, 4, -1, 11, -1, 10 };
 	int currentPlace = 0;
 	
 	log_printf(LOG_PRINTF,"\n");

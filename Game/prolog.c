@@ -156,6 +156,9 @@ int main(int argc, char *argv[]) {
 				else{
 					printf("Gandalf ist ersoffen\n");
 				}
+			}else if (strcmp(testText, "+ WAIT") == 0) {
+				//+ WAIT
+				sendOkwait();
 				
 				
 			} else if (strcmp(testText, "+ GAME") == 0) {
@@ -174,7 +177,6 @@ int main(int argc, char *argv[]) {
 			}
 		}
 
-		printField(shmPtr_Sf);
 		break;
 
 	default: // Thinker

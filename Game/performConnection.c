@@ -5,15 +5,10 @@ extern struct shmInfos* shmPtr;
 
 static void saveField(int* shmPtr_Sf, char *getText);
 
-int checkAndSendWait(char *getText) {
+void sendOkwait() {
 	char sendText[BUF];
-	int erg = 0;
-	if(strcmp(getText,"+ WAIT")==0) {
-		snprintf(sendText,10,"OKWAIT");
-		log_printf(LOG_DEBUG,"%s\n",sendText);
-		erg = netWrite(sendText);
-	}
-	return erg;
+	snprintf(sendText,10,"OKWAIT\n");
+	netWrite(sendText);
 }
 
 //Funktion prueft, ob buffer vom Server mit '-' beginnt (wenn ja, wird abgebrochen)
@@ -141,42 +136,58 @@ void parseNext(char* getText, struct shmInfos *shmPtr) {
 }
 
 int* parseField(char* getText) {
+	int hoehe;
+	int breite;
 	int *shmPtr_Sf = NULL;
-	
-	//ToDo: Spielfeldgroesse korrekt parsen
-	int len = strlen(getText);
-	char breiteChar[20];
-	int i;
-	while (getText[i] != ',' && i<len-1) {
-		breiteChar[i] = getText[i];
-		i++;
-	}	
-	breiteChar[i] = '\0';
-	int lenB = strlen(breiteChar);	
-	int hoehe = atoi(getText+lenB+1);
-	int breite = atoi(breiteChar+8);
 
-	log_printf(LOG_PRINTF,"Breite: %i\n",breite);
-	log_printf(LOG_PRINTF,"Hoehe: %i\n",hoehe);
-	
-	// Shared Memory Bereich fuer das Spielfeld anlegen
-	int shmid_Sf = shmSegment(hoehe*breite*sizeof(int));
-	shmPtr_Sf = shmSpielfeldAnbinden(shmid_Sf);
-	shmDelete(shmid_Sf);
-	
-	shmPtr->breite = breite;
-	shmPtr->hoehe = hoehe;
-
-	log_printf(LOG_DEBUG,"Hoehe im Shared Memory: %i\n",shmPtr->hoehe);
-	log_printf(LOG_DEBUG,"Breite im Shared Memory: %i\n",shmPtr->breite);
-
-	getText = netReadLine();
-	saveField(shmPtr_Sf,getText);
-
-	for(int i=0; i<16; i++) {
-		printf("%i ",shmPtr_Sf[i]);
+	//hoehe, breite nur speichen, wenn noch nicht geschehen
+	//Spielfeld sharedMem anlegen
+	if (shmPtr->breite == 0) {
+		
+		//ToDo: Spielfeldgroesse korrekt parsen
+		int len = strlen(getText);
+		char breiteChar[20];
+		int i;
+		while (getText[i] != ',' && i<len-1) {
+			breiteChar[i] = getText[i];
+			i++;
+		}	
+		breiteChar[i] = '\0';
+		int lenB = strlen(breiteChar);	
+		hoehe = atoi(getText+lenB+1);
+		breite = atoi(breiteChar+8);
+		
+		log_printf(LOG_PRINTF,"Breite: %i\n",breite);
+		log_printf(LOG_PRINTF,"Hoehe: %i\n",hoehe);
+		
+		// Shared Memory Bereich fuer das Spielfeld anlegen
+		int shmid_Sf = shmSegment(hoehe*breite*sizeof(int));
+		shmPtr_Sf = shmSpielfeldAnbinden(shmid_Sf);
+		shmDelete(shmid_Sf);
+		
+		shmPtr->breite = breite;
+		shmPtr->hoehe = hoehe;
+		
+		log_printf(LOG_DEBUG,"Hoehe im Shared Memory: %i\n",shmPtr->hoehe);
+		log_printf(LOG_DEBUG,"Breite im Shared Memory: %i\n",shmPtr->breite);
 	}
-	printf("\n");
+
+	// Spielfeld in array Speichern
+	for (int i=0; i<hoehe; i++) {
+		getText = netReadLine();
+		saveField(shmPtr_Sf,getText);
+		
+	}
+
+	
+//	saveField(shmPtr_Sf,blaText);
+	log_printf(LOG_DEBUG,"Spielfeldarray: ");
+	for(int i=0; i<16; i++) {
+		log_printf(LOG_DEBUG,"%i ",shmPtr_Sf[i]);
+	}
+	log_printf(LOG_DEBUG,"\n");
+
+	printField(shmPtr_Sf);
 
 	return shmPtr_Sf;
 }		
@@ -213,12 +224,14 @@ void saveField(int* shmPtr_Sf, char *getText) {
 		i++;
 	}
 	charHelp[j] = '\0';
-	
+	i++;	
 	int zeile = breite-atoi(charHelp);
         int currentField = zeile*breite;
+//printf("breite: %i\nzeile: %i\ncurrent: %i\n", breite,zeile,currentField);
 	while (breite) {
                 if (getText[i] == '*') {
                         shmPtr_Sf[currentField]= -1;
+			i++;
 		}
 		else if(getText[i] !=' ') {
 			j=0;
@@ -230,7 +243,6 @@ void saveField(int* shmPtr_Sf, char *getText) {
 			charHelp[j] = '\0';
 
 			shmPtr_Sf[currentField] = atoi(charHelp);
-			
 		}
 		currentField++;
 		i++;

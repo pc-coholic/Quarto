@@ -10,13 +10,14 @@
 #include "sharedmemory.h"
 #include "denkmal.h"
 #include "prozessSync.h"
+#include "spielfeldAusgabe.h"
 
 #define CLIENTVERSION "1.42"
 #define BUF 251
 
 #ifndef	prfrmCnnctn
 #define prfrmCnnctn
-	void checkMinus();
+	void checkMinus(char *buffer);
 	void sendVersion();
 	void sendGameId(char* gameId);
 	void parseGamekind(char* getText, struct shmInfos *shmPtr);
@@ -26,4 +27,5 @@
 	int* parseField(char* getText);
 	void sendThinking();
 	void parseGameover(char* getText);
+	void sendOkwait();
 #endif
