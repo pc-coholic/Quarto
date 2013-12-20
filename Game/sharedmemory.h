@@ -23,7 +23,8 @@ struct shmInfos{
 
 struct shmSpielfeld{
 	int breite;
-	int hoehe;		
+	int hoehe;
+	int *spielfeld[4*4];
 };
 
 

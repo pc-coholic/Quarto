@@ -3,6 +3,8 @@ extern struct shmInfos* shmPtr;
 // allgemeine Konvention: Funktionen geben 1 bei Erfolg und 0 bei Fehler zurueck
 // bei Funktionen: im if-Zweig Fehlerfall abfragen
 
+static void saveField(struct shmSpielfeld* shmPtr_Sf, char *getText);
+
 int checkAndSendWait(char *getText) {
 	char sendText[BUF];
 	int erg = 0;
@@ -138,36 +140,46 @@ void parseNext(char* getText, struct shmInfos *shmPtr) {
 	shmPtr->nextStone = next;
 }
 
-void parseField(char* getText) {
+struct shmSpielfeld* parseField(char* getText) {
 	struct shmSpielfeld *shmPtr_Sf = NULL;
 	
 	//ToDo: Spielfeldgroesse korrekt parsen
 	int len = strlen(getText);
 	char breiteChar[20];
 	int i;
-	for (i = 0; i < len; i++) {
-		if(getText[i] != ','){
+	while (getText[i] != ',' && i<len-1) {
 		breiteChar[i] = getText[i];
-		}
+		i++;
 	}	
+	breiteChar[i] = '\0';
 	int lenB = strlen(breiteChar);	
-	
 	int hoehe = atoi(getText+lenB+1);
 	int breite = atoi(breiteChar+8);
-	
-	printf("Breite %i\n",breite);
-	printf("Hoehe %i\n",hoehe);
+
+	log_printf(LOG_PRINTF,"Breite: %i\n",breite);
+	log_printf(LOG_PRINTF,"Hoehe: %i\n",hoehe);
 	
 	// Shared Memory Bereich fuer das Spielfeld anlegen
 	int shmid_Sf = shmSegment(hoehe*breite*sizeof(int));
 	shmPtr_Sf = shmSpielfeldAnbinden(shmid_Sf);
+	shmDelete(shmid_Sf);
 	
 	shmPtr_Sf->breite = breite;
 	shmPtr_Sf->hoehe = hoehe;
 
 	log_printf(LOG_DEBUG,"Hoehe im Shared Memory: %i\n",shmPtr_Sf->hoehe);
 	log_printf(LOG_DEBUG,"Breite im Shared Memory: %i\n",shmPtr_Sf->breite);
-	}		
+
+	getText = netReadLine();
+	saveField(shmPtr_Sf,getText);
+	int bla[10];	
+	for (int i; i<10; i++) {
+		printf("%i ",bla[i]);
+	}
+	printf("\n");
+
+	return shmPtr_Sf;
+}		
 
 void sendThinking() {
 	char sendText[BUF];
@@ -187,4 +199,41 @@ void sendMove(char* block, int nextblock) {
 	char sendText[BUF];
 	snprintf(sendText,15,"PLAY %s,%i\n", block, nextblock);
 	netWrite(sendText);
+}
+
+//Spielfeld in shm speichern
+void saveField(struct shmSpielfeld* shmPtr_Sf, char *getText) {
+        int breite = shmPtr_Sf->breite;
+	char charHelp[255];
+        int i = 2;
+        int j =0;
+	while (getText[i] != ' ') {
+		charHelp[j] = getText[i];
+		j++;
+		i++;
+	}
+	charHelp[j] = '\0';
+	
+	int hoehe = breite-atoi(charHelp);
+        int currentField = hoehe*breite;
+	int spielfeld[16];
+	log_printf(LOG_DEBUG,"Test in saveField: %i\n",spielfeld[0]);
+	while (breite) {
+                if (getText[i] == '*') {
+                        spielfeld[currentField]= -1;
+		}
+		else {
+			j=0;
+			while(getText[i] != ' ') {
+				charHelp[j] = getText[i];
+				j++;
+				i++;
+			}
+			charHelp[j] = '\0';
+
+			spielfeld[currentField] = atoi(charHelp);
+		}
+		i++;
+		breite--;
+	}
 }

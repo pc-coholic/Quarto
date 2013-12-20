@@ -1,6 +1,6 @@
 CC?=clang
 CFLAGS=-c -Wall -Werror -ggdb -std=gnu99
-SOURCES= ausgabe.c prozessSync.c logger.c performConnection.c network.c sharedmemory.c prolog.c config.c denkmal.c pipe.c
+SOURCES= spielfeldAusgabe.c prozessSync.c logger.c performConnection.c network.c sharedmemory.c prolog.c config.c denkmal.c pipe.c
 OBJECTS=$(SOURCES:.c=.o)
 EXECUTABLE=client
 

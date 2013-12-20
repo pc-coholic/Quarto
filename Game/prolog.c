@@ -20,9 +20,10 @@
 #include "prozessSync.h"
 #include "performConnection.h"
 #include "pipe.h"
-#include "ausgabe.h"
+#include "spielfeldAusgabe.h"
 
 struct shmInfos *shmPtr = NULL; //SHM-Pointer
+struct shmSpielfeld *shmPtr_Sf = NULL;
 
 // Nutzungsbeschreibung des Clienten
 void help() {
@@ -143,7 +144,7 @@ int main(int argc, char *argv[]) {
 				parseNext(getText, shmPtr);
 			} else if (strcmp(testText, "+ FIEL") == 0) {
 				//+ FIELD 4,4
-				parseField(getText);
+				shmPtr_Sf = parseField(getText);
 			} else if (strcmp(testText, "+ ENDF") == 0) {
 				//+ ENDFIELD
 				sendThinking();
@@ -173,7 +174,7 @@ int main(int argc, char *argv[]) {
 			}
 		}
 
-		printField();
+		printField(shmPtr_Sf);
 		break;
 
 	default: // Thinker
