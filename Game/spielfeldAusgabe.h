@@ -9,8 +9,8 @@
 #ifndef spielfeld
 #define spielfeld
 
-void printField(int *shmPtr_Sf);
-void printSpielstein(int *shmPtr_Sf,int i);
+void printField();
+void printSpielstein(int i);
 
 #endif
 

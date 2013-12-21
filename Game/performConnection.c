@@ -1,9 +1,10 @@
 #include "performConnection.h"
 extern struct shmInfos* shmPtr;
+extern int *shmPtr_Sf;
 // allgemeine Konvention: Funktionen geben 1 bei Erfolg und 0 bei Fehler zurueck
 // bei Funktionen: im if-Zweig Fehlerfall abfragen
 
-static void saveField(int* shmPtr_Sf, char *getText);
+static void saveField(char *getText);
 
 void sendOkwait() {
 	char sendText[BUF];
@@ -130,15 +131,14 @@ void parseMovetimeout(char* getText, struct shmInfos *shmPtr) {
 }
 
 void parseNext(char* getText, struct shmInfos *shmPtr) {
-	//ToDo: Naechsten Stein ins SHM schreiben
+	//Naechsten Stein ins SHM schreiben
 	int next = atoi(getText+7);
 	shmPtr->nextStone = next;
 }
 
-int* parseField(char* getText) {
+void parseField(char* getText) {
 	int hoehe;
 	int breite;
-	int *shmPtr_Sf = NULL;
 
 	//hoehe, breite nur speichen, wenn noch nicht geschehen
 	//Spielfeld sharedMem anlegen
@@ -175,7 +175,7 @@ int* parseField(char* getText) {
 	// Spielfeld in array Speichern
 	for (int i=0; i<hoehe; i++) {
 		getText = netReadLine();
-		saveField(shmPtr_Sf,getText);
+		saveField(getText);
 		
 	}
 
@@ -187,9 +187,8 @@ int* parseField(char* getText) {
 	}
 	log_printf(LOG_DEBUG,"\n");
 
-	printField(shmPtr_Sf);
+	printField();
 
-	return shmPtr_Sf;
 }		
 
 void sendThinking() {
@@ -206,14 +205,14 @@ void parseGameover(char* getText) {
 	log_printf(LOG_PRINTF,"You lost the game. Or won. Whatever\n");
 }
 
-void sendMove(char* block, int nextblock) {
+void sendMove() {
 	char sendText[BUF];
-	snprintf(sendText,15,"PLAY %s,%i\n", block, nextblock);
+	snprintf(sendText,15,"PLAY %s\n", shmPtr->spielzug);
 	netWrite(sendText);
 }
 
 //Spielfeld in shm speichern
-void saveField(int* shmPtr_Sf, char *getText) {
+void saveField(char *getText) {
         int breite = shmPtr->breite;
 	char charHelp[255];
         int i = 2;

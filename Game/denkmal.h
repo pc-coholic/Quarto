@@ -5,6 +5,7 @@
 #include <errno.h>
 
 #include "logger.h"
+#include "sharedmemory.h"
 
 
 #ifndef	nachdenk 

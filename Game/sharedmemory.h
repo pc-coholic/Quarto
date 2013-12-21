@@ -21,6 +21,7 @@ struct shmInfos{
 	int nextStone;
 	int breite;
 	int hoehe;
+	char spielzug[10];
 };
 
 int *spielfeld;

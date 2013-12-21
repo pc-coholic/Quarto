@@ -144,17 +144,17 @@ int main(int argc, char *argv[]) {
 				parseNext(getText, shmPtr);
 			} else if (strcmp(testText, "+ FIEL") == 0) {
 				//+ FIELD 4,4
-				shmPtr_Sf = parseField(getText);
+				parseField(getText);
 			} else if (strcmp(testText, "+ ENDF") == 0) {
 				//+ ENDFIELD
 				sendThinking();
 				//Hier Zug berechnen und per sendMove(stein, naechsterstein) senden
 				if(ueberwacheFd(pipe_fd)==1){
-					//sendMove(stein,naechsterstein);
-					printf("Gandalf (PIPE) hat gesprochen und wurde vor dem ertrinken gerettet!\n");
+					sendMove();
+					log_printf(LOG_DEBUG,"Gandalf (PIPE) hat gesprochen und wurde vor dem ertrinken gerettet!\n");
 				}
 				else{
-					printf("Gandalf ist ersoffen\n");
+					log_printf(LOG_PRINTF,"Gandalf ist ersoffen\n");
 				}
 			}else if (strcmp(testText, "+ WAIT") == 0) {
 				//+ WAIT
