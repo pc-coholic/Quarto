@@ -23,7 +23,7 @@
 #include "spielfeldAusgabe.h"
 
 struct shmInfos *shmPtr = NULL; //SHM-Pointer
-int *shmPtr_Sf = NULL;
+int *shmPtr_Sf = NULL; //Spielzug-Shm-Pointer
 
 // Nutzungsbeschreibung des Clienten
 void help() {
@@ -148,15 +148,17 @@ int main(int argc, char *argv[]) {
 			} else if (strcmp(testText, "+ ENDF") == 0) {
 				//+ ENDFIELD
 				sendThinking();
+			} else if (strcmp(testText, "+ OKTH") == 0) {
+				
 				//Hier Zug berechnen und per sendMove(stein, naechsterstein) senden
 				if(ueberwacheFd(pipe_fd)==1){
-					sendMove();
 					log_printf(LOG_DEBUG,"Gandalf (PIPE) hat gesprochen und wurde vor dem ertrinken gerettet!\n");
+					sendMove();
 				}
 				else{
 					log_printf(LOG_PRINTF,"Gandalf ist ersoffen\n");
 				}
-			}else if (strcmp(testText, "+ WAIT") == 0) {
+			} else if (strcmp(testText, "+ WAIT") == 0) {
 				//+ WAIT
 				sendOkwait();
 				
@@ -190,7 +192,6 @@ int main(int argc, char *argv[]) {
 		// In die Pipe schreiben
 			pipe_write(pipe_fd);
 
-			
 		if (wait (NULL) != pid) {
 			log_printf(LOG_ERROR,"Fehler beim Warten auf den Kindprozess\n");
 			return EXIT_FAILURE;

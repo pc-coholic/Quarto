@@ -10,6 +10,7 @@ void sendOkwait() {
 	char sendText[BUF];
 	snprintf(sendText,10,"OKWAIT\n");
 	netWrite(sendText);
+	log_printf(LOG_PRINTF,"Warten auf den anderen Spieler\n");
 }
 
 //Funktion prueft, ob buffer vom Server mit '-' beginnt (wenn ja, wird abgebrochen)
@@ -162,6 +163,7 @@ void parseField(char* getText) {
 		
 		// Shared Memory Bereich fuer das Spielfeld anlegen
 		int shmid_Sf = shmSegment(hoehe*breite*sizeof(int));
+		shmPtr->shmid_Sf = shmid_Sf;
 		shmPtr_Sf = shmSpielfeldAnbinden(shmid_Sf);
 		shmDelete(shmid_Sf);
 		
@@ -186,18 +188,22 @@ void parseField(char* getText) {
 		log_printf(LOG_DEBUG,"%i ",shmPtr_Sf[i]);
 	}
 	log_printf(LOG_DEBUG,"\n");
-
+	
+	log_printf(LOG_PRINTF,"\nNächster Stein: ");
+	printSpielstein(shmPtr->nextStone);
+	log_printf(LOG_PRINTF,"\n");
 	printField();
 
 }		
 
 void sendThinking() {
+	connector2thinker(getppid());
 	char sendText[BUF];
 	snprintf(sendText,12,"THINKING\n");
 	netWrite(sendText);
 	//Flag setzen und dem Thinker Bescheide geben
 	shmPtr->flag = 1;
-	connector2thinker(getppid());
+	log_printf(LOG_PRINTF,"\nSpielzug wird berechnet...");
 }
 
 void parseGameover(char* getText) {
@@ -209,6 +215,7 @@ void sendMove() {
 	char sendText[BUF];
 	snprintf(sendText,15,"PLAY %s\n", shmPtr->spielzug);
 	netWrite(sendText);
+	log_printf(LOG_PRINTF,"Done: %s\n",shmPtr->spielzug);
 }
 
 //Spielfeld in shm speichern

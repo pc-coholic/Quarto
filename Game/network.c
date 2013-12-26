@@ -51,9 +51,9 @@ char* netReadLine() {
 static int netRecv(char* bufAnf, size_t bufRestLen){
 		
 	int len = recv(socke, bufAnf, bufRestLen,0);
-	if(len == -1) {
-		log_printf(LOG_ERROR,"Fehler beim Empfangen von Daten vom Server!\n");
-		return 0;
+	if(len <= 0) {
+		log_printf(LOG_ERROR,"Fehler beim Empfangen der Daten vom Server!\n");
+		exit(EXIT_FAILURE);
 	}
 	return len;
 }

@@ -1,6 +1,7 @@
 #include "denkmal.h"
 
 extern struct shmInfos *shmPtr;
+extern int *shmPtr_Sf;
 //extern int *shmPtr_Sf;
 
 static void randomthink(char *spielzug);
@@ -8,6 +9,12 @@ static void randomthink(char *spielzug);
 static void indexToFeld(char *feld,int index);
 
 void think() {
+	
+	if(shmPtr_Sf == NULL) {
+		shmPtr_Sf = shmSpielfeldAnbinden(shmPtr->shmid_Sf);
+		shmDelete(shmPtr->shmid_Sf);
+	}
+
 	randomthink(shmPtr->spielzug);
 	log_printf(LOG_DEBUG,"Spielzug im SharedMem: %s\n",shmPtr->spielzug);
 }
@@ -16,9 +23,9 @@ void randomthink(char *spielzug) {
 	int nextStein=0;
 	int index=0;
 	int len = shmPtr->hoehe * shmPtr->breite;
-	int shmPtr_Sf[16] = { 9, 7, -1, 8, 3, -1, 2, -1, 15, -1, 6, 4, -1, 11, -1, 10 };
+	//int shmPtr_Sf[16] = { 9, 7, -1, 8, 3, -1, 2, -1, 15, -1, 6, 4, -1, 11, -1, 10 };
 
-
+	
 	//freies Feld suchen und speichern
 	do {
 		index++;

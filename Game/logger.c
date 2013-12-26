@@ -15,6 +15,5 @@ void log_printf(int level, const char *fmt, ...)
     if (level == LOG_ERROR) {
 	printf("\033[1m\033[31m"); //rot und bold
     }
-    printf("%s", msg);
-    printf("\033[0m"); //normale Ausgabe
+    printf("%s""\033[0m", msg); // msg ausgabe und umstellung auf normale Ausgabe
 }
