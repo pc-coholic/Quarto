@@ -152,7 +152,7 @@ int main(int argc, char *argv[]) {
 				
 				//Hier Zug berechnen und per sendMove(stein, naechsterstein) senden
 				if(ueberwacheFd(pipe_fd)==1){
-					log_printf(LOG_DEBUG,"Gandalf (PIPE) hat gesprochen und wurde vor dem ertrinken gerettet!\n");
+					log_printf(LOG_DEBUG,"Gandalf hat gesprochen und wurde vor dem ertrinken gerettet!\n");
 					sendMove();
 				}
 				else{
@@ -186,11 +186,17 @@ int main(int argc, char *argv[]) {
 		shmPtr->pid0=pid;
 
 		signal(SIGUSR1, signalHandler);
-		// Auf Signal warten	
-		pause();
+		
+		int bla =5;
+		while (bla){
+			// Auf Signal warten	
+			pause();
 			
-		// In die Pipe schreiben
+			log_printf(LOG_DEBUG,"thinker hat fertig gedacht\n");
+			// In die Pipe schreiben
 			pipe_write(pipe_fd);
+			bla--;
+		}
 
 		if (wait (NULL) != pid) {
 			log_printf(LOG_ERROR,"Fehler beim Warten auf den Kindprozess\n");

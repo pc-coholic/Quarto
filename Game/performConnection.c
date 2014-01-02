@@ -173,12 +173,15 @@ void parseField(char* getText) {
 		log_printf(LOG_DEBUG,"Hoehe im Shared Memory: %i\n",shmPtr->hoehe);
 		log_printf(LOG_DEBUG,"Breite im Shared Memory: %i\n",shmPtr->breite);
 	}
+	else {
+		breite = shmPtr->breite;
+		hoehe = shmPtr->hoehe;
+	}
 
 	// Spielfeld in array Speichern
 	for (int i=0; i<hoehe; i++) {
 		getText = netReadLine();
 		saveField(getText);
-		
 	}
 
 	
@@ -189,7 +192,7 @@ void parseField(char* getText) {
 	}
 	log_printf(LOG_DEBUG,"\n");
 	
-	log_printf(LOG_PRINTF,"\nNächster Stein: ");
+	log_printf(LOG_PRINTF,"\nNächster Stein: (%i)",shmPtr->nextStone);
 	printSpielstein(shmPtr->nextStone);
 	log_printf(LOG_PRINTF,"\n");
 	printField();

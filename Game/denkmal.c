@@ -15,6 +15,7 @@ void think() {
 		shmDelete(shmPtr->shmid_Sf);
 	}
 
+	log_printf(LOG_DEBUG,"Spielzug im SharedMem: %s\n",shmPtr->spielzug);
 	randomthink(shmPtr->spielzug);
 	log_printf(LOG_DEBUG,"Spielzug im SharedMem: %s\n",shmPtr->spielzug);
 }
@@ -50,6 +51,7 @@ void randomthink(char *spielzug) {
 		nextStein++;
 	}
 	sprintf(spielzug+3,"%i",nextStein);
+	log_printf(LOG_DEBUG,"Spielzug: %s\n", spielzug);
 }
 
 void indexToFeld(char *feld,int index) {

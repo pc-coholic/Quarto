@@ -11,11 +11,12 @@ int pipe_read(int pipe_fd[]){
 	if((read(pipe_fd[READ],getText,6)) < 0) {
 		log_printf(LOG_ERROR,"Fehler beim Lesen der Pipe");
 	}
-	close(pipe_fd[READ]);
+	//close(pipe_fd[READ]);
 	if(strcmp(getText,"okay")!=0){
 		log_printf(LOG_ERROR,"In der Pipe steht das Falsche\n");
 		return 0;
 	}
+	log_printf(LOG_DEBUG,"Pipe gelesen\n");
 	return 1;
 	
 	
@@ -28,8 +29,8 @@ int pipe_write(int pipe_fd[]){
 		log_printf(LOG_ERROR,"Fehler beim Schreiben in die Pipe\n");	
 		return 0;
 	}
-	close(pipe_fd[WRITE]);
-	
+	//close(pipe_fd[WRITE]);
+	log_printf(LOG_DEBUG,"Pipe geschrieben\n");
 	return 1;
 }
 
@@ -56,8 +57,10 @@ int ueberwacheFd(int pipe_fd[]){
 		return 0;
 	}
 	else if (FD_ISSET(pipe_fd[READ],&set)) {
+			log_printf(LOG_DEBUG,"Gandalf hat gedacht.\n");
 			return pipe_read(pipe_fd);
 		}
+	log_printf(LOG_DEBUG,"Gandalf denkt zu langsam.\n");
 	return 2;
 }
 	
