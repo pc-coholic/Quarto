@@ -116,39 +116,37 @@ int main(int argc, char *argv[]) {
 		//Verbindung mit Server herstellen
 		netConnect(configstruct.port, configstruct.hostname);
 
-		while (1 == 1) {
+		while (1) {
 			char *getText;
-			char testText[6];
-
 			getText = netReadLine();
 			//printf("%s\n", getText);
-			strncpy(testText, getText, 6);
-			if (strcmp(testText, "+ MNM ") == 0) {
+
+			if (strncmp(getText, "+ MNM ",6) == 0) {
 				//+ MNM Gameserver v1.0 accepting connections
 				sendVersion();
-			} else if (strcmp(testText, "+ Clie") == 0) {
+			} else if (strncmp(getText, "+ Clie",6) == 0) {
 				//+ Client version accepted - please send Game-ID to join
 				sendGameId(gameId);
-			} else if (strcmp(testText, "+ PLAY") == 0) {
+			} else if (strncmp(getText, "+ PLAY",6) == 0) {
 				//+ PLAYING Quarto
 				parseGamekind(getText, shmPtr);
 				sendPlayer(player, shmPtr);
-			} else if (strcmp(testText, "+ ENDP") == 0) {
+			} else if (strncmp(getText, "+ ENDP",6) == 0) {
 				//+ ENDPLAYERS
 				//noop
-			} else if (strcmp(testText, "+ MOVE") == 0) {
+			} else if (strncmp(getText, "+ MOVE",6) == 0) {
 				//+ MOVE 3000
 				parseMovetimeout(getText, shmPtr);
-			} else if (strcmp(testText, "+ NEXT") == 0) {
+			} else if (strncmp(getText, "+ NEXT",6) == 0) {
 				//+ NEXT 7
 				parseNext(getText, shmPtr);
-			} else if (strcmp(testText, "+ FIEL") == 0) {
+			} else if (strncmp(getText, "+ FIEL",6) == 0) {
 				//+ FIELD 4,4
 				parseField(getText);
-			} else if (strcmp(testText, "+ ENDF") == 0) {
+			} else if (strncmp(getText, "+ ENDF",6) == 0) {
 				//+ ENDFIELD
 				sendThinking();
-			} else if (strcmp(testText, "+ OKTH") == 0) {
+			} else if (strncmp(getText, "+ OKTH",6) == 0) {
 				
 				//Hier Zug berechnen und per sendMove(stein, naechsterstein) senden
 				if(ueberwacheFd(pipe_fd)==1){
@@ -158,20 +156,20 @@ int main(int argc, char *argv[]) {
 				else{
 					log_printf(LOG_PRINTF,"Gandalf ist ersoffen\n");
 				}
-			} else if (strcmp(testText, "+ WAIT") == 0) {
+			} else if (strncmp(getText, "+ WAIT",6) == 0) {
 				//+ WAIT
 				sendOkwait();
 				
 				
-			} else if (strcmp(testText, "+ GAME") == 0) {
+			} else if (strncmp(getText, "+ GAME",6) == 0) {
 				//+ GAMEOVER [[ hh Spielernummer des Gewinners ii hh Spielername des Gewinners ii ]]
 				parseGameover(getText);
 				parseField(getText);
-			} else if (strcmp(testText, "+ QUIT") == 0) {
+			} else if (strncmp(getText, "+ QUIT",6) == 0) {
 				//+ QUIT
 				//netDisconnect();
 				break;
-			} else if (strcmp(testText, "- Sock") == 0) {
+			} else if (strncmp(getText, "- Sock",6) == 0) {
 				//- Socket timeout - please be quicker next time
 				//Well, fuck.
 				//netDiscconnect();
@@ -187,15 +185,13 @@ int main(int argc, char *argv[]) {
 
 		signal(SIGUSR1, signalHandler);
 		
-		int bla =5;
-		while (bla){
+		while (1){
 			// Auf Signal warten	
 			pause();
 			
 			log_printf(LOG_DEBUG,"thinker hat fertig gedacht\n");
 			// In die Pipe schreiben
 			pipe_write(pipe_fd);
-			bla--;
 		}
 
 		if (wait (NULL) != pid) {

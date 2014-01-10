@@ -53,7 +53,7 @@ void parseGamekind(char* getText, struct shmInfos *shmPtr) {
 void sendPlayer(int player, struct shmInfos *shmPtr) {
 	char sendText[BUF]; 
 	char *getText;
-	int i;
+	int i=0;
 	// Gewuenschte Spielernummer an Server senden 
 	// optional Spielernummer angeben
 	if (player!='3') {
@@ -73,12 +73,6 @@ void sendPlayer(int player, struct shmInfos *shmPtr) {
 	shmPtr->attr[shmPtr->eigSpielernummer].spielerNr = shmPtr->eigSpielernummer;
 	strcpy(shmPtr->attr[shmPtr->eigSpielernummer].name,getText+8);
 	shmPtr->attr[shmPtr->eigSpielernummer].registered = 1;
-	
-	// Ausgabe Versuch Client Spieler
-	/*log_printf(LOG_DEBUG,"SpielernNr Client %i\n",shmPtr->attr[shmPtr->eigSpielernummer].spielerNr);
-	log_printf(LOG_DEBUG,"Spielername Client %s\n",shmPtr->attr[shmPtr->eigSpielernummer].name);
-	log_printf(LOG_DEBUG,"Spieler Registered Client %i\n",shmPtr->attr[shmPtr->eigSpielernummer].registered);*/
-	
 	
 	// schöne Ausgabe
 	log_printf(LOG_PRINTF,"You are Player %i (",getText[6]-'0'+1);
@@ -103,11 +97,6 @@ void sendPlayer(int player, struct shmInfos *shmPtr) {
 	strncpy(shmPtr->attr[anzSp].name,getText+4,strlen(getText+4)-2);
 	shmPtr->attr[anzSp].name[strlen(getText+4)-2] = '\0';
 	shmPtr->attr[anzSp].registered = getText[strlen(getText)-1]-'0';
-	// Ausgabe Versuch:
-	/*
-	log_printf(LOG_DEBUG,"SpielernNr Server %i\n",shmPtr->attr[anzSp].spielerNr);
-	log_printf(LOG_DEBUG,"Spielername Server %s\n",shmPtr->attr[anzSp].name);
-	log_printf(LOG_DEBUG,"Spieler Registered Server %i\n",shmPtr->attr[anzSp].registered);	*/
 	
 	// schöne Ausgabe
 	log_printf(LOG_PRINTF,"Player %c (",getText[2]);
@@ -148,7 +137,7 @@ void parseField(char* getText) {
 		//ToDo: Spielfeldgroesse korrekt parsen
 		int len = strlen(getText);
 		char breiteChar[20];
-		int i;
+		int i=0;
 		while (getText[i] != ',' && i<len-1) {
 			breiteChar[i] = getText[i];
 			i++;
