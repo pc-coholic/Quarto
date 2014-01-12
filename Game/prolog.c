@@ -112,12 +112,12 @@ int main(int argc, char *argv[]) {
 	case 0: // Connector
 		shmPtr->pid1=pid;
 			
-
+		char *getText;
+		
 		//Verbindung mit Server herstellen
 		netConnect(configstruct.port, configstruct.hostname);
 
 		while (1) {
-			char *getText;
 			getText = netReadLine();
 			//printf("%s\n", getText);
 
@@ -149,9 +149,11 @@ int main(int argc, char *argv[]) {
 			} else if (strncmp(getText, "+ OKTH",6) == 0) {
 				
 				//Hier Zug berechnen und per sendMove(stein, naechsterstein) senden
-				if(ueberwacheFd(pipe_fd)==1){
+				if(ueberwacheFd(pipe_fd,getText)==1){
 					log_printf(LOG_DEBUG,"Gandalf hat gesprochen und wurde vor dem ertrinken gerettet!\n");
-					sendMove();
+
+					//pipe_read(pipe_fd, getText);
+					sendMove(getText);
 				}
 				else{
 					log_printf(LOG_PRINTF,"Gandalf ist ersoffen\n");

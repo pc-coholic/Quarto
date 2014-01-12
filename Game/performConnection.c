@@ -203,11 +203,11 @@ void parseGameover(char* getText) {
 	log_printf(LOG_PRINTF,"You lost the game. Or won. Whatever\n");
 }
 
-void sendMove() {
+void sendMove(char *spielzug) {
 	char sendText[BUF];
-	snprintf(sendText,15,"PLAY %s\n", shmPtr->spielzug);
+	snprintf(sendText,15,"PLAY %s\n", spielzug);
 	netWrite(sendText);
-	log_printf(LOG_PRINTF,"Done: %s\n",shmPtr->spielzug);
+	log_printf(LOG_PRINTF,"Done: %s\n",spielzug);
 }
 
 //Spielfeld in shm speichern

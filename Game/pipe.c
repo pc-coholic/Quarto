@@ -4,19 +4,17 @@
 // Wenn in die Pipe geschrieben wurde dann gibt die Funktion 1 zurueck, 
 // wenn vom Server Timeout gesendet wird 2,  sonst 0
 
-// Liest aus der Pipe
-int pipe_read(int pipe_fd[]){
+extern char spielzug[10];
+// Liest aus der Pipe[
+int pipe_read(int pipe_fd[],char * getText){
 	close(pipe_fd[WRITE]);	
-	char getText[6];
-	if((read(pipe_fd[READ],getText,6)) < 0) {
+	if((read(pipe_fd[READ],getText,10)) < 0) {
 		log_printf(LOG_ERROR,"Fehler beim Lesen der Pipe");
-	}
-	//close(pipe_fd[READ]);
-	if(strcmp(getText,"okay")!=0){
-		log_printf(LOG_ERROR,"In der Pipe steht das Falsche\n");
+		perror("Error: ");
 		return 0;
 	}
-	log_printf(LOG_DEBUG,"Pipe gelesen\n");
+	
+	log_printf(LOG_DEBUG,"Pipe gelesen: %s\n", getText);
 	return 1;
 	
 	
@@ -25,7 +23,7 @@ int pipe_read(int pipe_fd[]){
 int pipe_write(int pipe_fd[]){
 	close(pipe_fd[READ]);
 	// In die Pipe schreiben
-	if((write(pipe_fd[WRITE],"okay",5))!=5){
+	if((write(pipe_fd[WRITE],spielzug,6))!=6){
 		log_printf(LOG_ERROR,"Fehler beim Schreiben in die Pipe\n");	
 		return 0;
 	}
@@ -39,7 +37,7 @@ int pipe_write(int pipe_fd[]){
    1 : Pipe ist ready
    2 : Socket lesbar
 */
-int ueberwacheFd(int pipe_fd[]){
+int ueberwacheFd(int pipe_fd[],char *getText){
 	int socket_fd = getSocketFd();
 	fd_set set;
 	FD_ZERO(&set);
@@ -58,8 +56,7 @@ int ueberwacheFd(int pipe_fd[]){
 	}
 	else if (FD_ISSET(pipe_fd[READ],&set)) {
 			log_printf(LOG_DEBUG,"Gandalf hat gedacht.\n");
-			return pipe_read(pipe_fd);
-		}
+			return pipe_read(pipe_fd, getText);		}
 	log_printf(LOG_DEBUG,"Gandalf denkt zu langsam.\n");
 	return 2;
 }

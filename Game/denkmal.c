@@ -1,12 +1,13 @@
 #include "denkmal.h"
 
+char spielzug[10];
 extern struct shmInfos *shmPtr;
 extern int *shmPtr_Sf;
 //extern int *shmPtr_Sf;
 
-static void randomthink(char *spielzug);
+static void randomthink();
 //berechnet aus dem arrayindex des Feldes den Feldnamen z.B. A1
-static void indexToFeld(char *feld,int index);
+static void indexToFeld(int index);
 
 void think() {
 	
@@ -15,12 +16,11 @@ void think() {
 		shmDelete(shmPtr->shmid_Sf);
 	}
 
-	log_printf(LOG_DEBUG,"Spielzug im SharedMem: %s\n",shmPtr->spielzug);
-	randomthink(shmPtr->spielzug);
-	log_printf(LOG_DEBUG,"Spielzug im SharedMem: %s\n",shmPtr->spielzug);
+	log_printf(LOG_DEBUG,"fängt an zu denken\n");
+	randomthink();
 }
 
-void randomthink(char *spielzug) {
+void randomthink() {
 	int nextStein=0;
 	int index=0;
 	int len = shmPtr->hoehe * shmPtr->breite;
@@ -34,19 +34,22 @@ void randomthink(char *spielzug) {
 			break;
 		}
 	} while(index < len);
-	indexToFeld(spielzug,index);
+	indexToFeld(index);
 	spielzug[2] = ',';
 
 	//freien Spielstein suchen und speichern
 	while (nextStein < 16) {
 		int i;
-		for(i=0;i<16;i++) {
-			if(shmPtr_Sf[i] == nextStein) {
+		if (nextStein != shmPtr->nextStone) {
+			
+			for(i=0;i<16;i++) {
+				if(shmPtr_Sf[i] == nextStein) {
+					break;
+				}
+			}
+			if(i==16) {
 				break;
 			}
-		}
-		if(i==16) {
-			break;
 		}
 		nextStein++;
 	}
@@ -54,10 +57,10 @@ void randomthink(char *spielzug) {
 	log_printf(LOG_DEBUG,"Spielzug: %s\n", spielzug);
 }
 
-void indexToFeld(char *feld,int index) {
+void indexToFeld(int index) {
 	//Spalte
-	feld[0] ='A' +(index % shmPtr->breite);
+	spielzug[0] ='A' +(index % shmPtr->breite);
 	//Reihe
-	feld[1] ='4' -(index/shmPtr->hoehe);
+	spielzug[1] ='4' -(index/shmPtr->hoehe);
 
 }

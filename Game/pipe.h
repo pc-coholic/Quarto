@@ -16,9 +16,9 @@
 #define READ 0
 
 
-int pipe_read(int pipe_fd[]);
+int pipe_read(int pipe_fd[],char *getText);
 int pipe_write(int pipe_fd[]);
-int ueberwacheFd(int pipe_fd[]);
+int ueberwacheFd(int pipe_fd[], char *getText);
 
 
 #endif 
