@@ -169,12 +169,17 @@ int main(int argc, char *argv[]) {
 				parseField(getText);
 			} else if (strncmp(getText, "+ QUIT",6) == 0) {
 				//+ QUIT
-				//netDisconnect();
+				netDisconnect();
 				break;
-			} else if (strncmp(getText, "- Sock",6) == 0) {
-				//- Socket timeout - please be quicker next time
+			} else if (strncmp(getText, "-",1) == 0) {
 				//Well, fuck.
-				//netDiscconnect();
+
+				//aufraeumen + signal an parent schicken, damit der sich beendet
+				netDisconnect();
+				free(confDateiName);
+				kill(getppid(),SIGCHLD);
+				
+
 				break;
 			}
 		}
@@ -186,6 +191,7 @@ int main(int argc, char *argv[]) {
 		shmPtr->pid0=pid;
 
 		signal(SIGUSR1, signalHandler);
+		signal(SIGCHLD, endHandler);
 		
 		while (1){
 			// Auf Signal warten	
@@ -203,6 +209,5 @@ int main(int argc, char *argv[]) {
 		break;
 	}
 
-	free(confDateiName);
 	return 0;
 }

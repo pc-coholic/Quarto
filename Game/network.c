@@ -121,3 +121,7 @@ int getSocketFd(){
 	return socke;
 }
 
+int netDisconnect() {
+	close(socke);
+	return 0;
+}

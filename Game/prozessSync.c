@@ -18,3 +18,6 @@ void signalHandler(int signum) {
 	think();
 }
 
+void endHandler(int signum) {
+	exit(EXIT_FAILURE);
+}	

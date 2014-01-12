@@ -13,4 +13,5 @@
 
 void connector2thinker(pid_t pid);
 void signalHandler();
+void endHandler();
 #endif

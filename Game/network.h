@@ -4,7 +4,7 @@
 //Verbindung mit Server herstellen 
 int netConnect(char* port, char* hostname);
 //Verbindung zum Server trennen 
-int netDisconnet();
+int netDisconnect();
 //eine Zeile einlesen, die der Server sendet
 char* netReadLine();
 //dem Server eine Zeile ins Socket schreiben
