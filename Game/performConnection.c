@@ -189,12 +189,12 @@ void parseField(char* getText) {
 }		
 
 void sendThinking() {
+	//Flag setzen und DANN dem Thinker Bescheid geben
+	shmPtr->flag = 1;
 	connector2thinker(getppid());
 	char sendText[BUF];
 	snprintf(sendText,12,"THINKING\n");
 	netWrite(sendText);
-	//Flag setzen und dem Thinker Bescheide geben
-	shmPtr->flag = 1;
 	log_printf(LOG_PRINTF,"\nSpielzug wird berechnet...");
 }
 
