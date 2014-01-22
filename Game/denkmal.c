@@ -43,7 +43,7 @@ void think() {
 
 void thinkbetter() {
 	int besetzteFelder[16]={0};
-	int spielsteineSchlecht[16];
+	int spielsteineSchlecht[16]={0};
 	int frei = -1;
 	int stein;
 
@@ -51,11 +51,11 @@ void thinkbetter() {
 	
 	//benutze Spielfelder und Steine übertragen
 	for(int i=0; i<16; i++) {
+		spielsteineSchlecht[i]=besetzteSteine[i];
 		if (shmPtr_Sf[i] >-1) {
-			spielsteineSchlecht[i]=besetzteSteine[i];
 			besetzteFelder[i] =1;
 		}
-		//log_printf(LOG_DEBUG,"Stein besetzt: %i, Spielstein: %i\n", besetzteSteine[i],i); 
+		log_printf(LOG_DEBUG,"Stein besetzt: %i, Spielstein: %i\n", besetzteSteine[i],i); 
 	}
 
 	// Zeilen auf Eigenschaften prüfen
@@ -83,16 +83,25 @@ void thinkbetter() {
 	 }
 	}
 
-	log_printf(LOG_DEBUG,"freies Feld: %i\n",frei);
+	log_printf(LOG_DEBUG,"end freies Feld: %i\n",frei);
 
 	// Spielfeld in Spielzug speichern
 	if (frei == -1) {
-			saveField(randomField(besetzteFelder));
+		saveField(randomField(besetzteFelder));
 	}			
+	else if(frei <16) {
+		saveField(frei);
+	}
 	spielzug[2] = ',';
 
 	// Spielstein festlegen
 	
+	log_printf(LOG_DEBUG,"schlechte Steine: ");
+	for (int i=0; i<16; i++) {
+		log_printf(LOG_DEBUG,"%i ",spielsteineSchlecht[i]);
+	}
+	log_printf(LOG_DEBUG,"\n");
+
 	if((stein = randomStone(spielsteineSchlecht))== -1){
 		stein = randomStone(besetzteSteine);
 	}
@@ -159,7 +168,7 @@ int compareFourStones(int a, int b, int c, int d) {
 		if (cmpTwoInvertBits(zwerg,c) > 0) {
 			zwerg = zwerg & c;
 			if (cmpTwoInvertBits(zwerg,d) > 0) {
-				printf("invert\n");
+				log_printf(LOG_DEBUG,"invert\n");
 				return 1;
 			}
 		}
@@ -168,7 +177,7 @@ int compareFourStones(int a, int b, int c, int d) {
 }
 // steinnummern angeben
 int cmpTwoInvertBits(int a, int b) {
-	int i = 3;
+	int i = 4;
 	int zwerg = a&b;
 	while(i) {
 		if(zwerg & 1) {
@@ -192,6 +201,7 @@ int checkFreiesFeld(int a, int b, int c, int d) {
 int checkReihe(int a, int b, int c, int d, int felder[], int badStones[]) {
 	if (felder[a]+felder[b]+felder[c]+felder[d] == 3) {
 		int frei = checkFreiesFeld(a,b,c,d);
+		log_printf(LOG_DEBUG,"freies Feld: %i\n",frei);
 		if (frei == a) {a = shmPtr->nextStone;}
 		else if (frei == b) {b = shmPtr->nextStone;}
 		else if (frei == c) {c = shmPtr->nextStone;}
