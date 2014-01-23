@@ -47,6 +47,7 @@ void thinkbetter() {
 	int spielsteineSchlecht[16]={0};
 	int frei = -1;
 	int stein;
+	srand(time(NULL));
 
 	besetzteSteine[shmPtr->nextStone] = 1;
 	
@@ -129,20 +130,17 @@ int randomField(int felder[]) {
 	}
 	}
 	//freies Feld suchen und speichern
-	srand(time(NULL));
 	int random = rand() % freieFelder;
 	int index = freieFelderArray[random];
 
 	log_printf(LOG_DEBUG,"Tolles freies Feld: %i\n",index);
 	return index;
 }
+
 // gibt möglichen Spielstein, oder -1 zurück
-
-
 int randomStone(int stones[]) {
 	//freien Spielstein suchen und speichern
 	//waehlt nextStein random aus 0 und 15
-	srand(time(NULL));
 	int nextStein = rand() % 16;
 
 while(1){	
@@ -151,7 +149,6 @@ while(1){
 			log_printf(LOG_DEBUG,"Naechster Stein: %i\n",nextStein);
 		}
 		else{
-		srand(time(NULL));
 		nextStein = rand() % 16;
 	}
 	}
