@@ -116,7 +116,7 @@ int randomField(int felder[]) {
 	int len = shmPtr->hoehe * shmPtr->breite; 
 	// Random Int von 0 bis Groesse des Spielfeldes
 	int index= rand() % len;
-	int gleicherIndex = index;
+	//int gleicherIndex = index;
 	//30 Versuche um Random ein freies Feld zu suchen.
 	int i = 30;
 	//int shmPtr_Sf[16] = { 9, 7, -1, 8, 3, -1, 2, -1, 15, -1, 6, 4, -1, 11, -1, 10 };
@@ -128,10 +128,10 @@ int randomField(int felder[]) {
 			break;
 		}
 		index = rand() % len;
-		if(index = gleicherIndex){
+		/*if(index = gleicherIndex){
 		index = rand() % len;
 		gleicherIndex = index;
-		}
+		}*/
 		i--;
 	} while(i>0);
 	log_printf(LOG_DEBUG,"Feld: %i\n",index);
@@ -144,7 +144,7 @@ int randomStone(int stones[]) {
 	srand(time(NULL));
 	//waehlt nextStein random aus 0 und 15
 	int nextStein = rand() % 16;
-	int gleicherStein = nextStein;
+	//int gleicherStein = nextStein;
 	// 30 Versuche einen naechsten Stein zu finden sollte ja reichen 
 	int i = 30;
 while(i > 0){	
@@ -153,10 +153,10 @@ while(i > 0){
 		}
 		else{
 		nextStein = rand() % 16;
-		if(nextStein = gleicherStein){
+		/*if(nextStein = gleicherStein){
 		nextStein = rand() % 16;
 		gleicherStein = nextStein;
-		}
+		}*/
 	}
 	i--;
 	}
