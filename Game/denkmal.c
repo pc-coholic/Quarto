@@ -84,10 +84,6 @@ void thinkbetter() {
 	 }
 	}
 
-<<<<<<< HEAD
-=======
-	log_printf(LOG_DEBUG,"end freies Feld: %i\n",frei);
->>>>>>> 080bd6995b8c413bd5ad23e28ba6a6679c3154ad
 	// Spielfeld in Spielzug speichern
 	if (frei == -1) {
 		saveField(randomField(besetzteFelder));
@@ -124,7 +120,7 @@ int randomField(int felder[]) {
 	anzahlBesetzt += felder[i];
 	}
 	int freieFelder = len-anzahlBesetzt;
-	int freieFelderArray[freieFelder] ={0};
+	int freieFelderArray[freieFelder];
 	int j = 0;
 	for(int i = 0; i<len;i++){
 	if(felder[i] == 0){
