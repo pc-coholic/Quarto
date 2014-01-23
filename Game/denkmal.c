@@ -20,7 +20,7 @@ static int checkReihe(int a, int b, int c, int d, int felder[],int badStones[]);
 
 void think() {
 	int groesse = shmPtr->breite * shmPtr->hoehe;
-	srand(time(NULL));	
+	
 	if(shmPtr_Sf == NULL) {
 		shmPtr_Sf = shmSpielfeldAnbinden(shmPtr->shmid_Sf);
 		shmDelete(shmPtr->shmid_Sf);
@@ -130,26 +130,32 @@ int randomField(int felder[]) {
 	}
 	}
 	//freies Feld suchen und speichern
+	srand(time(NULL));
 	int index = freieFelderArray[rand() % freieFelder];
 
 	log_printf(LOG_DEBUG,"Feld: %i\n",index);
 	return index;
 }
 // gibt möglichen Spielstein, oder -1 zurück
+
+
 int randomStone(int stones[]) {
 	//freien Spielstein suchen und speichern
 	//waehlt nextStein random aus 0 und 15
+	srand(time(NULL));
 	int nextStein = rand() % 16;
 
 while(1){	
 	if (stones[nextStein] ==0){
 			return nextStein;
+			log_printf(LOG_DEBUG,"Naechster Stein: %i\n",nextStein);
 		}
 		else{
+		srand(time(NULL));
 		nextStein = rand() % 16;
 	}
 	}
-	log_printf(LOG_DEBUG,"Stein: %i\n",nextStein);
+	log_printf(LOG_DEBUG,"Naechster Stein: %i\n",nextStein);
 	return -1;
 }
 
