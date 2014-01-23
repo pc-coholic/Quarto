@@ -115,50 +115,43 @@ int randomField(int felder[]) {
 	srand(time(NULL));
 	int len = shmPtr->hoehe * shmPtr->breite; 
 	// Random Int von 0 bis Groesse des Spielfeldes
-	int index= rand() % len;
-	//int gleicherIndex = index;
-	//30 Versuche um Random ein freies Feld zu suchen.
-	int i = 30;
+	
 	//int shmPtr_Sf[16] = { 9, 7, -1, 8, 3, -1, 2, -1, 15, -1, 6, 4, -1, 11, -1, 10 };
-
+	int anzahlBesetzt = 0;
+	
+	for(int i = 0; i<len;i++){
+	anzahlBesetzt += felder[i];
+	}
+	int freieFelder = len-anzahlBesetzt;
+	int freieFelderArray[freieFelder] ={0};
+	int j = 0;
+	for(int i = 0; i<len;i++){
+	if(felder[i] == 0){
+	freieFelderArray[j] = i;
+	j++;
+	}
+	}
 	
 	//freies Feld suchen und speichern
-	do {
-		if(felder[index] == 0 ) {
-			break;
-		}
-		index = rand() % len;
-		/*if(index = gleicherIndex){
-		index = rand() % len;
-		gleicherIndex = index;
-		}*/
-		i--;
-	} while(i>0);
+	int index = freieFelderArray[rand() % freieFelder];
+
 	log_printf(LOG_DEBUG,"Feld: %i\n",index);
 	return index;
 }
 // gibt möglichen Spielstein, oder -1 zurück
 int randomStone(int stones[]) {
 	//freien Spielstein suchen und speichern
-	//int nextStein=0;
 	srand(time(NULL));
 	//waehlt nextStein random aus 0 und 15
 	int nextStein = rand() % 16;
-	//int gleicherStein = nextStein;
-	// 30 Versuche einen naechsten Stein zu finden sollte ja reichen 
-	int i = 30;
-while(i > 0){	
+
+while(1){	
 	if (stones[nextStein] ==0){
 			return nextStein;
 		}
 		else{
 		nextStein = rand() % 16;
-		/*if(nextStein = gleicherStein){
-		nextStein = rand() % 16;
-		gleicherStein = nextStein;
-		}*/
 	}
-	i--;
 	}
 	log_printf(LOG_DEBUG,"Stein: %i\n",nextStein);
 	return -1;
