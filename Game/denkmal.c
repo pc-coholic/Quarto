@@ -56,7 +56,7 @@ void thinkbetter() {
 		if (shmPtr_Sf[i] >-1) {
 			besetzteFelder[i] =1;
 		}
-		log_printf(LOG_DEBUG,"Stein besetzt: %i, Spielstein: %i\n", besetzteSteine[i],i); 
+		//log_printf(LOG_DEBUG,"Stein besetzt: %i, Spielstein: %i\n", besetzteSteine[i],i); 
 	}
 
 	// Zeilen auf Eigenschaften prüfen
@@ -83,8 +83,6 @@ void thinkbetter() {
 	  }
 	 }
 	}
-
-	log_printf(LOG_DEBUG,"end freies Feld: %i\n",frei);
 
 	// Spielfeld in Spielzug speichern
 	if (frei == -1) {
@@ -174,12 +172,8 @@ void saveField(int index) {
 // Steinnummern angeben
 int compareFourStones(int a, int b, int c, int d) {
 	int zwerg;
-	if ((zwerg = a & b) > 0) {
-		if ((zwerg= zwerg & c) > 0) {
-			if ((zwerg= zwerg & d) >0) {
-				return 1;
-			}
-		}
+	if ((a&b&c&d) >0) {
+		return 1;
 	}
 	
 	a = ~a;
@@ -189,10 +183,9 @@ int compareFourStones(int a, int b, int c, int d) {
 	
 	if (cmpTwoInvertBits(a,b) ==1) {
 		zwerg = a & b;
-		if (cmpTwoInvertBits(zwerg,c) > 0) {
+		if (cmpTwoInvertBits(zwerg,c) == 1) {
 			zwerg = zwerg & c;
-			if (cmpTwoInvertBits(zwerg,d) > 0) {
-				log_printf(LOG_DEBUG,"invert\n");
+			if (cmpTwoInvertBits(zwerg,d) ==1) {
 				return 1;
 			}
 		}
@@ -225,26 +218,68 @@ int checkFreiesFeld(int a, int b, int c, int d) {
 int checkReihe(int a, int b, int c, int d, int felder[], int badStones[]) {
 	if (felder[a]+felder[b]+felder[c]+felder[d] == 3) {
 		int frei = checkFreiesFeld(a,b,c,d);
+		int stein1,stein2,stein3,stein4;
 		log_printf(LOG_DEBUG,"freies Feld: %i\n",frei);
-		if (frei == a) {a = shmPtr->nextStone;}
-		else if (frei == b) {b = shmPtr->nextStone;}
-		else if (frei == c) {c = shmPtr->nextStone;}
-		else if (frei == d) {d = shmPtr->nextStone;}
+		if (frei == a) {
+			stein1 = shmPtr->nextStone;
+			stein2 = shmPtr_Sf[b];
+			stein3 = shmPtr_Sf[c];
+			stein4 = shmPtr_Sf[d];
+		}
+		else if (frei == b) {
+			stein1 = shmPtr_Sf[a];
+			stein2 = shmPtr->nextStone;
+			stein3 = shmPtr_Sf[c];
+			stein4 = shmPtr_Sf[d];
+		}
+		else if (frei == c) {
+			stein1 = shmPtr_Sf[a];
+			stein2 = shmPtr_Sf[b];
+			stein3 = shmPtr->nextStone;
+			stein4 = shmPtr_Sf[d];
+		}
+		else if (frei == d) {
+			stein1 = shmPtr_Sf[a];
+			stein2 = shmPtr_Sf[b];
+			stein3 = shmPtr_Sf[c];
+			stein4 = shmPtr->nextStone;
+		}
 
-		if (compareFourStones(a,b,c,d) == 1) {
+		if (compareFourStones(stein1,stein2,stein3,stein4) == 1) {
 			//Yeah gewonnen!
 			saveField(frei);
+			log_printf(LOG_DEBUG,"gewonnen!\n");
 			return 16;
 		}
 		
 		// Gibt es Steine, die man auf das Feld nicht setzen sollte?
 		for(int i=0;i<16;i++) {
-			if (frei == a) {a = i;}
-			else if (frei == b) {b = i;}
-			else if (frei == c) {c = i;}
-			else if (frei == d) {d = i;}
+			if (frei == a) {
+				stein1 = i;
+				stein2 = shmPtr_Sf[b];
+				stein3 = shmPtr_Sf[c];
+				stein4 = shmPtr_Sf[d];
+			}
+			else if (frei == b) {
+				stein1 = shmPtr_Sf[a];
+				stein2 = i;
+				stein3 = shmPtr_Sf[c];
+				stein4 = shmPtr_Sf[d];
+			}
+			else if (frei == c) {
+				stein1 = shmPtr_Sf[a];
+				stein2 = shmPtr_Sf[b];
+				stein3 = i;
+				stein4 = shmPtr_Sf[d];
+			}
+			else if (frei == d) {
+				stein1 = shmPtr_Sf[a];
+				stein2 = shmPtr_Sf[b];
+				stein3 = shmPtr_Sf[c];
+				stein4 = i;
+			}
 
-			if (compareFourStones(a,b,c,d) ==1) {
+			if (compareFourStones(stein1,stein2,stein3,stein4) ==1) {
 				badStones[i] = 1;
 			}
 		}
