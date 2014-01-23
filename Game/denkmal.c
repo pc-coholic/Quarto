@@ -20,7 +20,7 @@ static int checkReihe(int a, int b, int c, int d, int felder[],int badStones[]);
 
 void think() {
 	int groesse = shmPtr->breite * shmPtr->hoehe;
-
+	srand(time(NULL));	
 	if(shmPtr_Sf == NULL) {
 		shmPtr_Sf = shmSpielfeldAnbinden(shmPtr->shmid_Sf);
 		shmDelete(shmPtr->shmid_Sf);
@@ -85,7 +85,6 @@ void thinkbetter() {
 	}
 
 	log_printf(LOG_DEBUG,"end freies Feld: %i\n",frei);
-
 	// Spielfeld in Spielzug speichern
 	if (frei == -1) {
 		saveField(randomField(besetzteFelder));
@@ -112,7 +111,6 @@ void thinkbetter() {
 }
 //gibt freies Feld zurück
 int randomField(int felder[]) {
-	srand(time(NULL));
 	int len = shmPtr->hoehe * shmPtr->breite; 
 	// Random Int von 0 bis Groesse des Spielfeldes
 	
@@ -131,7 +129,6 @@ int randomField(int felder[]) {
 	j++;
 	}
 	}
-	
 	//freies Feld suchen und speichern
 	int index = freieFelderArray[rand() % freieFelder];
 
@@ -141,7 +138,6 @@ int randomField(int felder[]) {
 // gibt möglichen Spielstein, oder -1 zurück
 int randomStone(int stones[]) {
 	//freien Spielstein suchen und speichern
-	srand(time(NULL));
 	//waehlt nextStein random aus 0 und 15
 	int nextStein = rand() % 16;
 
