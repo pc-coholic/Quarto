@@ -131,9 +131,10 @@ int randomField(int felder[]) {
 	}
 	//freies Feld suchen und speichern
 	srand(time(NULL));
-	int index = freieFelderArray[rand() % freieFelder];
+	int random = rand() % freieFelder;
+	int index = freieFelderArray[random];
 
-	log_printf(LOG_DEBUG,"Feld: %i\n",index);
+	log_printf(LOG_DEBUG,"Tolles freies Feld: %i\n",index);
 	return index;
 }
 // gibt möglichen Spielstein, oder -1 zurück
