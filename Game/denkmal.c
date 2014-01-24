@@ -44,9 +44,12 @@ void think() {
 
 void thinkbetter() {
 	int besetzteFelder[16]={0};
+	int guteFelder[16]={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
 	int spielsteineSchlecht[16]={0};
 	int frei = -1;
 	int stein;
+	int isThereAStone=0;
+	int isThereAField=0;
 	srand(time(NULL));
 
 	besetzteSteine[shmPtr->nextStone] = 1;
@@ -62,19 +65,29 @@ void thinkbetter() {
 
 	// Zeilen auf Eigenschaften prüfen
 	if ((frei = checkReihe(0,1,2,3,besetzteFelder,spielsteineSchlecht))!= 16){
-	 if ((frei = checkReihe(4,5,6,7,besetzteFelder,spielsteineSchlecht))!= 16){
-	  if ((frei = checkReihe(8,9,10,11,besetzteFelder,spielsteineSchlecht))!= 16){
-	   if ((frei = checkReihe(12,13,14,15,besetzteFelder,spielsteineSchlecht))!= 16){
+	   if (frei >0) guteFelder[frei]=0;
+	   if ((frei = checkReihe(4,5,6,7,besetzteFelder,spielsteineSchlecht))!= 16){
+	      if (frei >0) guteFelder[frei]=0;
+	      if ((frei = checkReihe(8,9,10,11,besetzteFelder,spielsteineSchlecht))!= 16){
+	         if (frei >0) guteFelder[frei]=0;
+	         if ((frei = checkReihe(12,13,14,15,besetzteFelder,spielsteineSchlecht))!= 16){
+	            if (frei >0) guteFelder[frei]=0;
 
 	// Spalten prüfen
-	    if ((frei = checkReihe(0,4,8,12,besetzteFelder,spielsteineSchlecht))!= 16){
-	     if ((frei = checkReihe(1,5,9,13,besetzteFelder,spielsteineSchlecht))!= 16){
-	      if ((frei = checkReihe(2,6,10,14,besetzteFelder,spielsteineSchlecht))!= 16){
-	       if ((frei = checkReihe(3,7,11,15,besetzteFelder,spielsteineSchlecht))!= 16){
+	            if ((frei = checkReihe(0,4,8,12,besetzteFelder,spielsteineSchlecht))!= 16){
+	               if (frei >0) guteFelder[frei]=0;
+	               if ((frei = checkReihe(1,5,9,13,besetzteFelder,spielsteineSchlecht))!= 16){
+	                  if (frei >0) guteFelder[frei]=0;
+	                  if ((frei = checkReihe(2,6,10,14,besetzteFelder,spielsteineSchlecht))!= 16){
+	                     if (frei >0) guteFelder[frei]=0;
+	                     if ((frei = checkReihe(3,7,11,15,besetzteFelder,spielsteineSchlecht))!= 16){
+	                        if (frei >0) guteFelder[frei]=0;
 
 	// Diagonalen prüfen
-	        if ((frei = checkReihe(0,5,10,15,besetzteFelder,spielsteineSchlecht))!= 16){
-	         frei = checkReihe(3,6,9,12,besetzteFelder,spielsteineSchlecht);
+	                        if ((frei = checkReihe(0,5,10,15,besetzteFelder,spielsteineSchlecht))!= 16){
+	                           if (frei >0) guteFelder[frei]=0;
+	                           frei = checkReihe(3,6,9,12,besetzteFelder,spielsteineSchlecht);
+	                           if (frei >0) guteFelder[frei]=0;
 	        }
                }
               }
@@ -85,24 +98,47 @@ void thinkbetter() {
 	 }
 	}
 
-	// Spielfeld in Spielzug speichern
-	if (frei == -1) {
-		saveField(randomField(besetzteFelder));
-	}			
-	else if(frei <16) {
-		saveField(frei);
+	// Gibt es ein Reihe mit drei Steinen? -> freies Feld ist nächstes Feld
+	log_printf(LOG_DEBUG,"guteFelder: ");
+	for (int i=0; i<16; i++) {
+		log_printf(LOG_DEBUG,"%i ",guteFelder[i]);
+		if (guteFelder[i] == 0) {
+			isThereAField = 1;
+		} 	
 	}
+	log_printf(LOG_DEBUG,"\n");
+	log_printf(LOG_DEBUG,"isThereAField: %i\n",isThereAField);
+
+	if(frei < 16) {
+		if(isThereAField==1){
+			log_printf(LOG_DEBUG,"there is\n");
+			saveField(randomField(guteFelder));
+		} else{
+			log_printf(LOG_DEBUG,"Nope, there isn't\n");
+			saveField(randomField(besetzteFelder));
+		}
+	}
+
 	spielzug[2] = ',';
 
 	// Spielstein festlegen
 	
+	// Gibt es einen Stein, der keine Gefahr darstellt?
 	log_printf(LOG_DEBUG,"schlechte Steine: ");
 	for (int i=0; i<16; i++) {
 		log_printf(LOG_DEBUG,"%i ",spielsteineSchlecht[i]);
+		if (spielsteineSchlecht[i] == 0) {
+			isThereAStone = 1;
+		} 	
 	}
 	log_printf(LOG_DEBUG,"\n");
+	log_printf(LOG_DEBUG,"isThereAStone: %i\n",isThereAStone);
 
-	if((stein = randomStone(spielsteineSchlecht))== -1){
+	if(isThereAStone==1){
+		log_printf(LOG_DEBUG,"there is\n");
+		stein = randomStone(spielsteineSchlecht);
+	} else{
+		log_printf(LOG_DEBUG,"Nope, there isn't\n");
 		stein = randomStone(besetzteSteine);
 	}
 	log_printf(LOG_DEBUG,"stein: %i\n",stein);
@@ -118,16 +154,16 @@ int randomField(int felder[]) {
 	int anzahlBesetzt = 0;
 	
 	for(int i = 0; i<len;i++){
-	anzahlBesetzt += felder[i];
+		anzahlBesetzt += felder[i];
 	}
 	int freieFelder = len-anzahlBesetzt;
 	int freieFelderArray[freieFelder];
 	int j = 0;
 	for(int i = 0; i<len;i++){
-	if(felder[i] == 0){
-	freieFelderArray[j] = i;
-	j++;
-	}
+		if(felder[i] == 0){
+			freieFelderArray[j] = i;
+			j++;
+		}	
 	}
 	//freies Feld suchen und speichern
 	int random = rand() % freieFelder;
@@ -145,8 +181,8 @@ int randomStone(int stones[]) {
 
 while(1){	
 	if (stones[nextStein] ==0){
-			return nextStein;
 			log_printf(LOG_DEBUG,"Naechster Stein: %i\n",nextStein);
+			return nextStein;
 		}
 		else{
 		nextStein = rand() % 16;
