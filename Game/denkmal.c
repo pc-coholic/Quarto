@@ -5,7 +5,6 @@ char spielzug[10];
 extern struct shmInfos *shmPtr;
 extern int *shmPtr_Sf;
 int besetzteSteine[16];
-//extern int *shmPtr_Sf;
 
 static void thinkbetter();
 static int randomStone(int stones[]);
@@ -21,11 +20,13 @@ static int checkReihe(int a, int b, int c, int d, int felder[],int badStones[]);
 void think() {
 	int groesse = shmPtr->breite * shmPtr->hoehe;
 	
+	// shm für Spielfeld attachen
 	if(shmPtr_Sf == NULL) {
 		shmPtr_Sf = shmSpielfeldAnbinden(shmPtr->shmid_Sf);
 		shmDelete(shmPtr->shmid_Sf);
 
 	}
+	// Welche Steine sind besetzt?
 	for(int i=0;i<groesse;i++) {
 		besetzteSteine[i]=0;
 		for(int j=0;j<groesse;j++) {
@@ -54,18 +55,17 @@ void thinkbetter() {
 
 	besetzteSteine[shmPtr->nextStone] = 1;
 	
-	//benutze Spielfelder und Steine übertragen
+	//benutze Spielfelder und Steine kopieren
 	for(int i=0; i<16; i++) {
 		spielsteineSchlecht[i]=besetzteSteine[i];
 		if (shmPtr_Sf[i] >-1) {
 			besetzteFelder[i] =1;
 		}
-		//log_printf(LOG_DEBUG,"Stein besetzt: %i, Spielstein: %i\n", besetzteSteine[i],i); 
 	}
 
 	// Zeilen auf Eigenschaften prüfen
 	if ((frei = checkReihe(0,1,2,3,besetzteFelder,spielsteineSchlecht))!= 16){
-	   if (frei >0) guteFelder[frei]=0;
+	   if (frei >0) guteFelder[frei]=0; //gefährliche Felder speichern
 	   if ((frei = checkReihe(4,5,6,7,besetzteFelder,spielsteineSchlecht))!= 16){
 	      if (frei >0) guteFelder[frei]=0;
 	      if ((frei = checkReihe(8,9,10,11,besetzteFelder,spielsteineSchlecht))!= 16){
@@ -98,7 +98,7 @@ void thinkbetter() {
 	 }
 	}
 
-	// Gibt es ein Reihe mit drei Steinen? -> freies Feld ist nächstes Feld
+	// Gibt es ein Reihe mit drei Steinen?
 	log_printf(LOG_DEBUG,"guteFelder: ");
 	for (int i=0; i<16; i++) {
 		log_printf(LOG_DEBUG,"%i ",guteFelder[i]);
@@ -109,6 +109,7 @@ void thinkbetter() {
 	log_printf(LOG_DEBUG,"\n");
 	log_printf(LOG_DEBUG,"isThereAField: %i\n",isThereAField);
 
+	// wenn nicht gewonnen, dann hier saveField, sonst siehe checkReihe()
 	if(frei < 16) {
 		if(isThereAField==1){
 			log_printf(LOG_DEBUG,"there is\n");
@@ -134,6 +135,7 @@ void thinkbetter() {
 	log_printf(LOG_DEBUG,"\n");
 	log_printf(LOG_DEBUG,"isThereAStone: %i\n",isThereAStone);
 
+	//wenn nicht, dann randomField()
 	if(isThereAStone==1){
 		log_printf(LOG_DEBUG,"there is\n");
 		stein = randomStone(spielsteineSchlecht);
@@ -145,12 +147,11 @@ void thinkbetter() {
 	sprintf(spielzug+3,"%i",stein);
 	log_printf(LOG_DEBUG,"Spielzug: %s\n",spielzug);
 }
-//gibt freies Feld zurück
+//gibt Feld zurück
 int randomField(int felder[]) {
 	int len = shmPtr->hoehe * shmPtr->breite; 
 	// Random Int von 0 bis Groesse des Spielfeldes
 	
-	//int shmPtr_Sf[16] = { 9, 7, -1, 8, 3, -1, 2, -1, 15, -1, 6, 4, -1, 11, -1, 10 };
 	int anzahlBesetzt = 0;
 	
 	for(int i = 0; i<len;i++){
@@ -173,7 +174,7 @@ int randomField(int felder[]) {
 	return index;
 }
 
-// gibt möglichen Spielstein, oder -1 zurück
+// gibt möglichen Spielstein zurück
 int randomStone(int stones[]) {
 	//freien Spielstein suchen und speichern
 	//waehlt nextStein random aus 0 und 15
@@ -201,11 +202,13 @@ void saveField(int index) {
 }
 // Steinnummern angeben
 int compareFourStones(int a, int b, int c, int d) {
+	//gleiche Eigenschaft = 1
 	int zwerg;
 	if ((a&b&c&d) >0) {
 		return 1;
 	}
 	
+	// falls gleiche Eigenschaft = 0 (aber es ist eine vorhanden
 	a = ~a;
 	b = ~b;
 	c = ~c;
@@ -244,12 +247,14 @@ int checkFreiesFeld(int a, int b, int c, int d) {
 	return 0;
 }
 // indizies/Feldnummer angeben
-// return: 16 bei gewonnen, -1 bei weniger als drei Steine, sonst das freie Feld
+// return: 16 bei gewonnen(dann wird auch gleich Feld in Spielzug gespeichert), -1 bei weniger als drei Steine, sonst das freie Feld
 int checkReihe(int a, int b, int c, int d, int felder[], int badStones[]) {
 	if (felder[a]+felder[b]+felder[c]+felder[d] == 3) {
 		int frei = checkFreiesFeld(a,b,c,d);
 		int stein1,stein2,stein3,stein4;
+		stein1 =0; stein2 =0; stein3 =0; stein4 =0;
 		log_printf(LOG_DEBUG,"freies Feld: %i\n",frei);
+		// freies Feld wird durch nextStone ersetzt
 		if (frei == a) {
 			stein1 = shmPtr->nextStone;
 			stein2 = shmPtr_Sf[b];

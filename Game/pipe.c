@@ -27,7 +27,6 @@ int pipe_write(int pipe_fd[]){
 		log_printf(LOG_ERROR,"Fehler beim Schreiben in die Pipe\n");	
 		return 0;
 	}
-	//close(pipe_fd[WRITE]);
 	log_printf(LOG_DEBUG,"Pipe geschrieben\n");
 	return 1;
 }

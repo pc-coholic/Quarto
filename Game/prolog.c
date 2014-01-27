@@ -9,7 +9,6 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <getopt.h>
-//prozess
 #include <sys/wait.h>
 #include <signal.h>
 
@@ -62,7 +61,7 @@ int main(int argc, char *argv[]) {
 		exit(EXIT_FAILURE);
 	}
 
-	//optional gewunschte Spielernummer und config Dateiname einlesen 
+	//optional gewunschte Spielernummer, config Dateiname oder log Level einlesen 
 	while ((ret=getopt(argc, argv, "p:c:l:")) != -1) {
 	switch (ret) {
 	case 'p':
@@ -119,7 +118,6 @@ int main(int argc, char *argv[]) {
 
 		while (1) {
 			getText = netReadLine();
-			//printf("%s\n", getText);
 
 			if (strncmp(getText, "+ MNM ",6) == 0) {
 				//+ MNM Gameserver v1.0 accepting connections
@@ -150,11 +148,10 @@ int main(int argc, char *argv[]) {
         }
 			} else if (strncmp(getText, "+ OKTH",6) == 0) {
 				
-				//Hier Zug berechnen und per sendMove(stein, naechsterstein) senden
+				//Hier Zug erhalten und per sendMove(stein, naechsterstein) senden
 				if(ueberwacheFd(pipe_fd,getText)==1){
 					log_printf(LOG_DEBUG,"Gandalf hat gesprochen und wurde vor dem ertrinken gerettet!\n");
 
-					//pipe_read(pipe_fd, getText);
 					sendMove(getText);
 				}
 				else{

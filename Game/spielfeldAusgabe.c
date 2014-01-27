@@ -12,7 +12,6 @@ void printField() {
 	int breite= shmPtr->breite;
 	int hoehe = shmPtr->hoehe;
 	int *field = shmPtr_Sf;
-//	int field[17] = { 9, 7, -1, 8, 3, -1, 2, -1, 15, -1, 6, 4, -1, 11, -1, 10 };
 	int currentPlace = 0;
 	
 	log_printf(LOG_PRINTF,"\n");
@@ -23,9 +22,6 @@ void printField() {
 		int n=breite;
 
 		if(1) {printSteinNummern(field,breite,currentPlace);}
-		/*if(n!=hoehe) { 
-			printMultiZeichen(breite,'|',' ');
-		}*/
 
 		log_printf(LOG_PRINTF,"%i | ",hoehe);
 		//einzelne Steine ausgeben
@@ -50,7 +46,7 @@ void printField() {
 	printSpaltenNamen(breite);
 }
 
-//Spielstein in binärdastellung
+//Spielste Darstellung
 void printSpielstein(int i) {
 	int breite = shmPtr->breite;
 	while (breite) {
@@ -66,7 +62,7 @@ void printSpielstein(int i) {
 }
 
 //die Spaltennamen von A bis ... printen
-static void printSpaltenNamen(int breite) {
+void printSpaltenNamen(int breite) {
 	char c = 'A';
 	while (breite) {
 		log_printf(LOG_PRINTF,"    %c",c);
@@ -77,7 +73,7 @@ static void printSpaltenNamen(int breite) {
 }
 
 //die Begrenzungszeilen über und unter dem Spielfeld
-static void printMultiZeichen(int breite,char beginEnd,char between) {
+void printMultiZeichen(int breite,char beginEnd,char between) {
 	log_printf(LOG_PRINTF,"  %c",beginEnd);
 	int i= breite*breite+breite+1;
 	while (i) {
@@ -88,7 +84,7 @@ static void printMultiZeichen(int breite,char beginEnd,char between) {
 }
 
 //Steinnummernausgeben
-static void printSteinNummern(int field[],int breite, int currentPlace) {
+void printSteinNummern(int field[],int breite, int currentPlace) {
 	int n = breite;
 	log_printf(LOG_PRINTF,"  | ""\033[2m");
 	while (n) {
