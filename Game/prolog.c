@@ -145,7 +145,9 @@ int main(int argc, char *argv[]) {
 				parseField(getText);
 			} else if (strncmp(getText, "+ ENDF",6) == 0) {
 				//+ ENDFIELD
-				sendThinking();
+        if (shmPtr->gameover != 1) {
+  				sendThinking();
+        }
 			} else if (strncmp(getText, "+ OKTH",6) == 0) {
 				
 				//Hier Zug berechnen und per sendMove(stein, naechsterstein) senden
@@ -161,12 +163,10 @@ int main(int argc, char *argv[]) {
 			} else if (strncmp(getText, "+ WAIT",6) == 0) {
 				//+ WAIT
 				sendOkwait();
-				
-				
 			} else if (strncmp(getText, "+ GAME",6) == 0) {
 				//+ GAMEOVER [[ hh Spielernummer des Gewinners ii hh Spielername des Gewinners ii ]]
+        shmPtr->gameover = 1;
 				parseGameover(getText);
-				parseField(getText);
 			} else if (strncmp(getText, "+ QUIT",6) == 0) {
 				//+ QUIT
 				netDisconnect();

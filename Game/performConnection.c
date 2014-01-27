@@ -200,7 +200,12 @@ void sendThinking() {
 
 void parseGameover(char* getText) {
 	//ToDo: Gewinner parsen
-	log_printf(LOG_PRINTF,"You lost the game. Or won. Whatever\n");
+  int winnerid = atoi(getText+11);
+  if (winnerid - 1 == shmPtr->eigSpielernummer) {
+    log_printf(LOG_PRINTF, "\033[1m\033[32m""You, %s, won the game.\n""\033[0m", shmPtr->attr[shmPtr->eigSpielernummer].name);
+  } else {
+    log_printf(LOG_PRINTF, "\033[1m\033[31m""You lost the game. %s won.\n""\033[0m", shmPtr->attr[winnerid - 1].name);
+  }
 }
 
 void sendMove(char *spielzug) {

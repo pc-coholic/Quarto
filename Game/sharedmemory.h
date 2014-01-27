@@ -22,6 +22,7 @@ struct shmInfos{
 	int breite;
 	int hoehe;
 	int shmid_Sf;
+  int gameover;
 };
 
 int *spielfeld;
