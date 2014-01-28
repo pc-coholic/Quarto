@@ -126,11 +126,13 @@ void thinkbetter() {
 	
 	// Gibt es einen Stein, der keine Gefahr darstellt?
 	log_printf(LOG_DEBUG,"schlechte Steine: ");
-	for (int i=0; i<16; i++) {
-		log_printf(LOG_DEBUG,"%i ",spielsteineSchlecht[i]);
-		if (spielsteineSchlecht[i] == 0) {
-			isThereAStone = 1;
-		} 	
+	if(frei < 16) {
+		for (int i=0; i<16; i++) {
+			log_printf(LOG_DEBUG,"%i ",spielsteineSchlecht[i]);
+			if (spielsteineSchlecht[i] == 0) {
+				isThereAStone = 1;
+			} 	
+		}
 	}
 	log_printf(LOG_DEBUG,"\n");
 	log_printf(LOG_DEBUG,"isThereAStone: %i\n",isThereAStone);
