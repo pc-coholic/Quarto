@@ -13,14 +13,6 @@ void sendOkwait() {
 	log_printf(LOG_PRINTF,"Warten auf den anderen Spieler\n");
 }
 
-//Funktion prueft, ob buffer vom Server mit '-' beginnt (wenn ja, wird abgebrochen)
-void checkMinus(char *buffer) {
-	if(buffer[0] == '-') {
-		log_printf(LOG_PRINTF, "\n\n%s\n\n",buffer);
-		exit(EXIT_FAILURE);
-	}
-}
-
 void sendVersion() {
 	char sendText[BUF];
 	snprintf(sendText,23,"VERSION %s\n",CLIENTVERSION);
@@ -66,7 +58,6 @@ void sendPlayer(int player, struct shmInfos *shmPtr) {
 
 	//Server: zugeteilte Spielernummer und Name 
 	getText = netReadLine();
-	checkMinus(getText);
 	// Spielernummer in shmInfo eintragen
 	shmPtr->eigSpielernummer = getText[6]-'0';
 	//struct PlayerAttr befuellen fuer unseren Client 
@@ -74,7 +65,7 @@ void sendPlayer(int player, struct shmInfos *shmPtr) {
 	strcpy(shmPtr->attr[shmPtr->eigSpielernummer].name,getText+8);
 	shmPtr->attr[shmPtr->eigSpielernummer].registered = 1;
 	
-	// schöne Ausgabe
+	//schoene Ausgabe
 	log_printf(LOG_PRINTF,"You are Player %i (",getText[6]-'0'+1);
 	i=8;
 	while(getText[i] != '\0') {
@@ -98,7 +89,7 @@ void sendPlayer(int player, struct shmInfos *shmPtr) {
 	shmPtr->attr[anzSp].name[strlen(getText+4)-2] = '\0';
 	shmPtr->attr[anzSp].registered = getText[strlen(getText)-1]-'0';
 	
-	// schöne Ausgabe
+	// schoene Ausgabe
 	log_printf(LOG_PRINTF,"Player %c (",getText[2]);
 	i=4;
 	while(getText[i+2] != '\0') {
@@ -217,23 +208,24 @@ void sendMove(char *spielzug) {
 
 //Spielfeld in shm speichern
 void saveField(char *getText) {
-        int breite = shmPtr->breite;
+  int breite = shmPtr->breite;
 	char charHelp[255];
-        int i = 2;
-        int j =0;
+  int i = 2;
+  int j =0;
 	while (getText[i] != ' ') {
 		charHelp[j] = getText[i];
 		j++;
 		i++;
 	}
+
 	charHelp[j] = '\0';
 	i++;	
 	int zeile = breite-atoi(charHelp);
-        int currentField = zeile*breite;
-//printf("breite: %i\nzeile: %i\ncurrent: %i\n", breite,zeile,currentField);
+  int currentField = zeile*breite;
+
 	while (breite) {
-                if (getText[i] == '*') {
-                        shmPtr_Sf[currentField]= -1;
+  	if (getText[i] == '*') {
+    	shmPtr_Sf[currentField]= -1;
 			i++;
 		}
 		else if(getText[i] !=' ') {
@@ -244,9 +236,9 @@ void saveField(char *getText) {
 				i++;
 			}
 			charHelp[j] = '\0';
-
 			shmPtr_Sf[currentField] = atoi(charHelp);
 		}
+
 		currentField++;
 		i++;
 		breite--;

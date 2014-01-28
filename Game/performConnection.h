@@ -17,7 +17,6 @@
 
 #ifndef	prfrmCnnctn
 #define prfrmCnnctn
-	void checkMinus(char *buffer);
 	void sendVersion();
 	void sendGameId(char* gameId);
 	void parseGamekind(char* getText, struct shmInfos *shmPtr);

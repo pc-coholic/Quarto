@@ -2,10 +2,10 @@
 
 // Ueberwacht ob Server oder Pipe etwas geschrieben hat 
 // Wenn in die Pipe geschrieben wurde dann gibt die Funktion 1 zurueck, 
-// wenn vom Server Timeout gesendet wird 2,  sonst 0
+// wenn vom Server Timeout gesendet wird 2, sonst 0
 
 extern char spielzug[10];
-// Liest aus der Pipe[
+// Liest aus der Pipe
 int pipe_read(int pipe_fd[],char * getText){
 	close(pipe_fd[WRITE]);	
 	if((read(pipe_fd[READ],getText,10)) < 0) {
@@ -13,12 +13,11 @@ int pipe_read(int pipe_fd[],char * getText){
 		perror("Error: ");
 		return 0;
 	}
-	
+
 	log_printf(LOG_DEBUG,"Pipe gelesen: %s\n", getText);
 	return 1;
-	
-	
 }
+
 // Schreibt in die Pipe 
 int pipe_write(int pipe_fd[]){
 	close(pipe_fd[READ]);
@@ -37,6 +36,7 @@ int pipe_write(int pipe_fd[]){
    2 : Socket lesbar
 */
 int ueberwacheFd(int pipe_fd[],char *getText){
+	//Observe the pi(p)e with the magic of Gandalf the Grey
 	int socket_fd = getSocketFd();
 	fd_set set;
 	FD_ZERO(&set);
@@ -59,4 +59,3 @@ int ueberwacheFd(int pipe_fd[],char *getText){
 	log_printf(LOG_DEBUG,"Gandalf denkt zu langsam.\n");
 	return 2;
 }
-	

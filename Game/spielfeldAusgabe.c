@@ -89,20 +89,20 @@ void printSteinNummern(int field[],int breite, int currentPlace) {
 	log_printf(LOG_PRINTF,"  | ""\033[2m");
 	while (n) {
 		if (field[currentPlace] == -1) {
-                               for (int i=0; i<breite; i++) {
-                                       log_printf(LOG_PRINTF," ");
-                               }
-                       }
-                       else {
-                               log_printf(LOG_PRINTF,"\033[2m""(%i)""\033[0m",field[currentPlace]);
+			for (int i=0; i<breite; i++) {
+      	log_printf(LOG_PRINTF," ");
+      }
+    }
+    else {
+    	log_printf(LOG_PRINTF,"\033[2m""(%i)""\033[0m",field[currentPlace]);
 			if(field[currentPlace] < 10) {
 				log_printf(LOG_PRINTF," ");
 			}
-                       }
-                       log_printf(LOG_PRINTF," ");
-                       currentPlace++;
-                       n--;
-               }
+    }
+    log_printf(LOG_PRINTF," ");
+    currentPlace++;
+    n--;
+	}
 	log_printf(LOG_PRINTF,"|\n");
 	currentPlace = currentPlace - breite;
 	n= breite;

@@ -38,7 +38,6 @@ char* netReadLine() {
 	  	bufferGet[i] = '\0';
 	    bufferEnde = i;
 	   	log_printf(LOG_DEBUG,"\033[1m\033[33m""S: ""\033[0m""%s\n",bufferGet); // bold yellow
-	   // fflush(stdout);
 	    return bufferGet;
 	  }
 	}
@@ -49,7 +48,6 @@ char* netReadLine() {
 
 //Hilfs-Funktion empfaengt Text vom Server
 static int netRecv(char* bufAnf, size_t bufRestLen){
-		
 	int len = recv(socke, bufAnf, bufRestLen,0);
 	if(len <= 0) {
 		log_printf(LOG_ERROR,"Fehler beim Empfangen der Daten vom Server!\n");
@@ -74,14 +72,12 @@ int netWrite(char *bufferSend) {
 		return 0;
 	}
 	log_printf(LOG_DEBUG,"\033[1m\033[36m""C: ""\033[0m""%s",bufferSend); // cyan bold
-	//fflush(stdout);
 	return 1;
 }
 
 // Verbindet sich mit dem Server 
 int netConnect(char* port, char* hostname ) {
   struct addrinfo hints, *servinfo, *p;
-
 
 	memset(&hints, 0, sizeof hints);
   hints.ai_family = AF_UNSPEC;

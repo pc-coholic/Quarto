@@ -27,7 +27,6 @@ struct shmInfos{
 
 int *spielfeld;
 
-
 //Shared Memory Segment erstellen 
 int shmSegment(int size);
 //Shared Memory Bereich an die shmId anbinden
@@ -35,6 +34,5 @@ struct shmInfos* shmAnbinden(int shmid);
 int *shmSpielfeldAnbinden(int shmid);
 //Segment Loeschen bei Prozessende
 void shmDelete(int shmid);
-
 #endif
 

@@ -17,6 +17,7 @@ static int cmpTwoInvertBits(int a, int b);
 static int checkFreiesFeld(int a, int b, int c, int d);
 static int checkReihe(int a, int b, int c, int d, int felder[],int badStones[]);
 
+//Denk, denk, denk...
 void think() {
 	int groesse = shmPtr->breite * shmPtr->hoehe;
 	
@@ -24,7 +25,6 @@ void think() {
 	if(shmPtr_Sf == NULL) {
 		shmPtr_Sf = shmSpielfeldAnbinden(shmPtr->shmid_Sf);
 		shmDelete(shmPtr->shmid_Sf);
-
 	}
 	// Welche Steine sind besetzt?
 	for(int i=0;i<groesse;i++) {
@@ -38,9 +38,7 @@ void think() {
 	}
 
 	log_printf(LOG_DEBUG,"fängt an zu denken\n");
-
 	thinkbetter();
-
 }
 
 void thinkbetter() {
@@ -176,7 +174,7 @@ int randomField(int felder[]) {
 	return index;
 }
 
-// gibt möglichen Spielstein zurück
+// gibt (zufaelligen) moeglichen Spielstein zurueck
 int randomStone(int stones[]) {
 	//freien Spielstein suchen und speichern
 	//waehlt nextStein random aus 0 und 15
@@ -187,9 +185,9 @@ while(1){
 			log_printf(LOG_DEBUG,"Naechster Stein: %i\n",nextStein);
 			return nextStein;
 		}
-		else{
-		nextStein = rand() % 16;
-	}
+	else{
+			nextStein = rand() % 16;
+		}
 	}
 	log_printf(LOG_DEBUG,"Naechster Stein: %i\n",nextStein);
 	return -1;

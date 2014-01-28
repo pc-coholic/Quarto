@@ -41,7 +41,7 @@ int main(int argc, char *argv[]) {
 	strcpy(confDateiName, "client.conf");
 	pid_t pid;
 
-    //Config-Datei einlesen und struct betanken
+  //Config-Datei einlesen und struct betanken
 	log_printf(LOG_DEBUG,"Using config-file %s\n",confDateiName);
 	configstruct = get_config(confDateiName);
 
@@ -85,19 +85,18 @@ int main(int argc, char *argv[]) {
 	}
 
 	//Shared-Memory erstellen 
-	// shmSegment() um die ID zu erstellen -> vor fork()
+	//shmSegment() um die ID zu erstellen -> vor fork()
 	int shmid = shmSegment(sizeof(struct shmInfos));
 
-	//und shmAnbinden(shmid); um es an den Prozess zu binden
+	//shmAnbinden(shmid); um es an den Prozess zu binden
 	shmPtr = shmAnbinden(shmid);
 
 	//shm automatisch entfernen, wenn alle prozesse detached sind
 	shmDelete(shmid);
 	
-	// Pipe anlegen
+	//Pipe anlegen
 	int pipe_fd[2];
 	if(pipe(pipe_fd)<0){
-	
 		log_printf(LOG_ERROR,"Fehler bei Pipe anlegen");
 	};
 
@@ -110,7 +109,6 @@ int main(int argc, char *argv[]) {
 		break;
 	case 0: // Connector
 		shmPtr->pid1=pid;
-			
 		char *getText;
 		
 		//Verbindung mit Server herstellen
@@ -151,7 +149,6 @@ int main(int argc, char *argv[]) {
 				//Hier Zug erhalten und per sendMove(stein, naechsterstein) senden
 				if(ueberwacheFd(pipe_fd,getText)==1){
 					log_printf(LOG_DEBUG,"Gandalf hat gesprochen und wurde vor dem ertrinken gerettet!\n");
-
 					sendMove(getText);
 				}
 				else{
@@ -175,8 +172,6 @@ int main(int argc, char *argv[]) {
 				netDisconnect();
 				free(confDateiName);
 				kill(getppid(),SIGCHLD);
-				
-
 				break;
 			}
 		}
@@ -187,7 +182,9 @@ int main(int argc, char *argv[]) {
 		
 		shmPtr->pid0=pid;
 
+		//wenn das Signal kommt, dass er denken soll
 		signal(SIGUSR1, signalHandler);
+		//wenn das Signal vom Kind kommt, dass er sich beenden soll (wegen Fehler)
 		signal(SIGCHLD, endHandler);
 		
 		while (1){
